@@ -56,7 +56,7 @@ CREATE TABLE `loaisp` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `loaisp`
+-- Đang đổ dữ liệu cho bảng `loaisp` a
 --
 
 INSERT INTO `loaisp` (`idloai`, `tenloai`, `mota`) VALUES
