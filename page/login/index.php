@@ -17,7 +17,7 @@
 ?>
 
 <main class="flex-1 flex items-center justify-center py-12">
-      <div class="w-full max-w-sm bg-white shadow-xl rounded-2xl p-6">
+      <div class="bg-white shadow-xl rounded-2xl p-6 " style="width: 550px">
         <h2 class="text-xl font-bold text-center text-orange-600 mb-6">Đăng nhập</h2>
         
         <form id="loginForm" method="post" enctype="multipart/form-data" class="space-y-4 flex flex-col">
