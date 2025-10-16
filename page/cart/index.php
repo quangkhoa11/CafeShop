@@ -96,33 +96,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
     </div>
 
     <div class="text-right mr-3">
-    <?php if (isset($_SESSION['idkh'])): ?>
-<div class="text-right mt-4">
-    <button id="checkoutBtn" class="bg-orange-500 text-white font-bold py-2 px-4 rounded" style="border-radius: 3px;">
-        Thanh toán
-    </button>
-</div>
+<?php if (isset($_SESSION['idkh'])): ?>
+    <div class="text-right mt-4">
+        <button style="border-radius: 3px;" id="checkoutBtn" class="bg-orange-500 text-white font-bold py-2 px-4 rounded">
+            Thanh toán
+        </button>
+    </div>
 
-<div id="checkoutForm" class="hidden checkout-form" style="margin-bottom: 30px;">
-    <h2>Thông tin giao hàng</h2>
-    <form id="formCheckout" method="post" action="index.php?page=order-details">
-        <div class="form-group">
-            <label>Họ và tên:</label>
-            <input type="text" name="tenkh" required placeholder="Nhập họ và tên">
-        </div>
-        <div class="form-group">
-            <label>Địa chỉ:</label>
-            <input type="text" name="diachi" required placeholder="Nhập địa chỉ giao hàng">
-        </div>
-        <div class="form-group">
-            <label>Số điện thoại:</label>
-            <input type="tel" name="sdt" required pattern="[0-9]{10}" placeholder="Nhập số điện thoại">
-        </div>
-        <button type="submit" name="confirm_order">Xác nhận đơn hàng</button>
-    </form>
-</div>
+    <div id="checkoutForm" class="hidden checkout-form">
+        <h2>Thông tin giao hàng</h2>
+        <form id="formCheckout" method="post" action="index.php?page=order-details">
+            <div class="form-group">
+                <label>Họ và tên:</label>
+                <input type="text" name="tenkh" required placeholder="Nhập họ và tên">
+            </div>
+            <div class="form-group">
+                <label>Địa chỉ:</label>
+                <input type="text" name="diachi" required placeholder="Nhập địa chỉ giao hàng">
+            </div>
+            <div class="form-group">
+                <label>Số điện thoại:</label>
+                <input type="tel" name="sdt" required pattern="[0-9]{10}" placeholder="Nhập số điện thoại">
+            </div>
+            <button type="submit" name="confirm_order">Xác nhận đơn hàng</button>
+        </form>
+    </div>
+<?php else: ?>
+    <p class="text-center text-red-500 font-semibold mt-4">
+        Vui lòng <a href="index.php?page=login" class="underline text-orange-500">đăng nhập</a> để thanh toán
+    </p>
 <?php endif; ?>
 </div>
+
   </div>
 
   <?php else: ?>
