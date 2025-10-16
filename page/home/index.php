@@ -9,11 +9,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
     $soluong = (int)$_POST['soluong'];
     $da = $_POST['da'];
     $duong = $_POST['duong'];
+    $size = $_POST['size'];
     $ghichu = trim($_POST['ghichu']);
 
     if (!isset($_SESSION['cart'])) $_SESSION['cart'] = [];
 
-    $cart_key = md5($idsp . $da . $duong . $ghichu);
+    $cart_key = md5($idsp . $da . $duong . $size . $ghichu);
     if (isset($_SESSION['cart'][$cart_key])) {
         $_SESSION['cart'][$cart_key]['soluong'] += $soluong;
     } else {
@@ -25,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
             'soluong' => $soluong,
             'da' => $da,
             'duong' => $duong,
+            'size' => $size,
             'ghichu' => $ghichu
         ];
     }
@@ -119,6 +121,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
                 </div>
 
                 <div class="option-group">
+                    <p>Size</p>
+                    <label><input type="radio" name="size" value="M" checked> Size M</label>
+                    <label><input type="radio" name="size" value="L"> Size L</label>
+                </div>
+
+
+
+                <div class="option-group">
                     <p>Ghi chú:</p>
                     <textarea name="ghichu" placeholder="Ví dụ: không đá, thêm sữa..." class="w-full border rounded-lg p-2 text-sm"></textarea>
                 </div>
@@ -141,23 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
     <link rel="stylesheet" href="assets/css/modal.css">
 
 <style>
-#cartMessage {
-  display: none;
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background-color: #16a34a;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  font-weight: 600;
-  z-index: 9999;
-  opacity: 0;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
 #cartMessage.show {
-  display: block;
   opacity: 1;
   transform: translateY(0);
 }
@@ -217,3 +211,4 @@ document.getElementById('modalForm').addEventListener('submit', async function(e
 </script>
 
 </main>
+
