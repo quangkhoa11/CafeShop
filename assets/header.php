@@ -20,13 +20,21 @@
               <a href="index.php?page=cart" class="hover:text-orange-500 font-semibold pr-3">Giỏ hàng</a>
               <a href="index.php?page=contact" class="hover:text-orange-500 font-semibold pr-3">Liên hệ</a>
               <?php
-                if (isset($_SESSION['dangnhap'])) {
-                echo '<div class="text-orange-600"> <b>Chào, </b>'. $_SESSION['username'].'</div>';
-                echo '<a href="index.php?page=dangxuat" class="text-orange-500 font-semibold pr-3">Đăng xuất</a>';
-            } else {
-             echo '<a href="index.php?page=login" class="text-orange-500 font-semibold pr-3">Đăng nhập</a>';
-            }
-            ?>
+                if (isset($_SESSION['idkh'])) {
+                    $idkh = $_SESSION['idkh'];
+                    $db = new database();
+                    $sql = "SELECT tenkh FROM khachhang WHERE idkh = $idkh";
+                    $result = $db->xuatdulieu($sql);
+
+                    $tenkh = ($result && count($result) > 0) ? $result[0]['tenkh'] : 'Khách hàng';
+
+                    echo '<div class="text-orange-600"><b>Chào, </b>'.htmlspecialchars($tenkh).'</div>';
+                    echo '<a href="index.php?page=dangxuat" class="text-orange-500 font-semibold pr-3">Đăng xuất</a>';
+                } else {
+                    echo '<a href="index.php?page=login" class="text-orange-500 font-semibold pr-3">Đăng nhập</a>';
+                    echo '<a href="index.php?page=register" class="text-orange-500 font-semibold pr-3">Đăng ký</a>';
+                }
+              ?>
             </nav>
           </div>
         </div>
