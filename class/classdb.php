@@ -27,7 +27,7 @@
 
         public function dangnhap($tk, $mk) {
             $link = $this->ketnoi();
-            $sql = "select idkh from khachhang where sdt='$tk' and matkhau='$mk'";
+            $sql = "select idkh from khachhang where email='$tk' and matkhau='$mk'";
             $result = $link->query($sql);
             if ($result->num_rows) {
                 $row = $result->fetch_assoc();
