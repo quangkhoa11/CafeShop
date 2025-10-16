@@ -7,11 +7,13 @@
 
         $tkmk = $obj->dangnhap($tk, $mk);
         if ($tkmk) {
-            $_SESSION['dangnhap'] = $tkmk;
-            $_SESSION['username'] = $tk;
-            header("location:index.php?page=home");
-            exit;
-        }
+        $_SESSION['dangnhap'] = $tkmk; 
+        $_SESSION['idkh'] = $tkmk;     
+        $_SESSION['username'] = $tk;    
+    header("location:index.php?page=home");
+    exit;
+}
+
         echo '<script>alert("Đăng nhập không thành công!");</script>';
     }
 ?>
