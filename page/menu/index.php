@@ -11,11 +11,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart']) && isset(
     $soluong = (int)$_POST['soluong'];
     $da = $_POST['da'] ?? '';
     $duong = $_POST['duong'] ?? '';
+    $size = $_POST['size'] ?? '';
     $ghichu = trim($_POST['ghichu']);
 
     if (!isset($_SESSION['cart'])) $_SESSION['cart'] = [];
 
-    $cart_key = md5($idsp . $da . $duong . $ghichu);
+    $cart_key = md5($idsp . $da . $duong . $size .$ghichu);
 
     if (isset($_SESSION['cart'][$cart_key])) {
         $_SESSION['cart'][$cart_key]['soluong'] += $soluong;
@@ -28,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart']) && isset(
             'soluong' => $soluong,
             'da' => $da,
             'duong' => $duong,
+            'size' => $size,
             'ghichu' => $ghichu
         ];
     }
@@ -109,6 +111,13 @@ if ($sanpham) {
                     <label><input type="radio" name="duong" value="Vừa đường"> Vừa</label>
                     <label><input type="radio" name="duong" value="Nhiều đường"> Nhiều</label>
                 </div>
+
+                <div class="option-group">
+                    <p>Size:</p>
+                    <label><input type="radio" name="size" value="M" checked> Size M</label>
+                    <label><input type="radio" name="size" value="L"> Size L</label>
+                </div>
+
             </div>
 
             <div class="option-group">
@@ -147,7 +156,6 @@ function openModal(idsp, name, price, img, idloai){
     document.getElementById('modalLoai').value = idloai;
     document.getElementById('modalQty').value = 1;
 
-    // Nếu idloai = 3 thì hiển thị phần đá đường, ngược lại ẩn đi
     const daDuongSection = document.getElementById('daDuongSection');
     if (idloai == 3) {
         daDuongSection.style.display = 'block';
@@ -187,9 +195,11 @@ function addToCartModal(event){
 
     let da = '';
     let duong = '';
+    let size = '';
     if (idloai == 3) {
         da = document.querySelector('input[name="da"]:checked').value;
         duong = document.querySelector('input[name="duong"]:checked').value;
+        size = document.querySelector('input[name="size"]:checked').value;
     }
 
     const ghichu = document.querySelector('textarea[name="ghichu"]').value;
@@ -209,6 +219,7 @@ function addToCartModal(event){
         soluong: soluong,
         da: da,
         duong: duong,
+        size: size,
         ghichu: ghichu
     });
 
@@ -232,4 +243,3 @@ function addToCartModal(event){
     });
 }
 </script>
-<link rel="stylesheet" href="assets/css/modal.css?v=2">
