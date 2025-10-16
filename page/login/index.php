@@ -21,7 +21,7 @@
         <h2 class="text-xl font-bold text-center text-orange-600 mb-6">Đăng nhập</h2>
         
         <form id="loginForm" method="post" enctype="multipart/form-data" class="space-y-4 flex flex-col">
-          <input type="text" name="tk" placeholder="Số điện thoại" required
+          <input type="email" name="tk" placeholder="Email" required
             class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 border-gray-300 placeholder-gray-400 text-sm">
           
           <input type="password" name="mk" placeholder="Mật khẩu" required
