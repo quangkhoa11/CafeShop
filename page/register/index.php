@@ -1,4 +1,5 @@
-<?php
+<?php 
+require_once 'mail/sendmail.php';
 $obj = new database();
 $errors = [];
 $success = '';
@@ -25,13 +26,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     }
 
     if (empty($errors)) {
-        $sql = "INSERT INTO khachhang (tenkh, sdt, diachi, email, matkhau) 
-                VALUES ('$tenkh', '$sdt', '$diachi', '$email', '$matkhau')";
-        $link = new mysqli("localhost","root","","cafeshop");
-        if ($link->query($sql) === TRUE) {
-            $success = "Đăng ký thành công! <a href='index.php?page=login'>Đăng nhập ngay</a>.";
+        $otp = rand(100000, 999999);
+
+        $_SESSION['register_data'] = [
+            'tenkh' => $tenkh,
+            'sdt' => $sdt,
+            'diachi' => $diachi,
+            'email' => $email,
+            'matkhau' => $matkhau,
+            'otp' => $otp
+        ];
+
+        $subject = "Mã xác nhận đăng ký tài khoản CafeShop";
+        $body = "
+            <h2>Xin chào $tenkh,</h2>
+            <p>Cảm ơn bạn đã đăng ký tài khoản tại <b>CafeShop</b>.</p>
+            <p>Mã OTP của bạn là: <b style='font-size:18px;'>$otp</b></p>
+            <p>Mã có hiệu lực trong 5 phút.</p>
+        ";
+
+        if (sendMail($email, $subject, $body)) {
+            header("Location: index.php?page=verify_otp");
+            exit;
         } else {
-            $errors[] = "Lỗi khi lưu dữ liệu: " . $link->error;
+            $errors[] = "Không thể gửi email xác nhận. Vui lòng thử lại.";
         }
     }
 }
