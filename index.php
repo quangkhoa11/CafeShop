@@ -8,6 +8,9 @@
     }else{
         $page='home';
     }
+    if ($_GET['page'] == 'verify_otp') {
+    include 'page/register/verify_otp.php';
+}
     if(isset($_GET['cate'])){
         $cate=$_GET['cate'];
     }
