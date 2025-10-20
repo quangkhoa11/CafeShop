@@ -25,16 +25,16 @@
                     $db = new database();
                     $sql = "SELECT tenkh FROM khachhang WHERE idkh = $idkh";
                     $result = $db->xuatdulieu($sql);
-
                     $tenkh = ($result && count($result) > 0) ? $result[0]['tenkh'] : 'Khách hàng';
 
-                    echo '<div><b>Chào, </b>'.htmlspecialchars($tenkh).'</div>';
-                    echo '<a href="index.php?page=dangxuat" class=" font-semibold pr-3">Đăng xuất</a>';
+                    echo '<div><b>Chào, </b><a href="index.php?page=customer" class="font-semibold hover:underline">'
+                        . htmlspecialchars($tenkh) . '</a></div>';
+                    echo '<a href="index.php?page=dangxuat" class="font-semibold pr-3">Đăng xuất</a>';
                 } else {
-                    echo '<a href="index.php?page=login" class=" font-semibold pr-3">Đăng nhập</a>';
-                    echo '<a href="index.php?page=register" class=" font-semibold pr-3">Đăng ký</a>';
+                    echo '<a href="index.php?page=login" class="font-semibold pr-3">Đăng nhập</a>';
+                    echo '<a href="index.php?page=register" class="font-semibold pr-3">Đăng ký</a>';
                 }
-              ?>
+                ?>
             </nav>
           </div>
         </div>
