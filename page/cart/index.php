@@ -1,3 +1,4 @@
+<title>Giỏ hàng</title>
 <?php
 $obj = new database();
 

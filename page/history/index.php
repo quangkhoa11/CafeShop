@@ -1,3 +1,4 @@
+<title>Chi tiết đơn hàng <?= htmlspecialchars($_GET['iddonban'] ?? '') ?></title>
 <?php
 
 if (!isset($_GET['iddonban'])) {

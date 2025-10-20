@@ -1,3 +1,4 @@
+<title>Chi tiết đơn hàng</title>
 <?php
 $obj = new database();
 

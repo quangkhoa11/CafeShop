@@ -1,3 +1,4 @@
+<title>Menu</title>
 <?php
 $obj = new database();
 

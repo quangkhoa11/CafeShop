@@ -1,3 +1,4 @@
+<title>Thông tin khách hàng</title>
 <?php
 if (!isset($_SESSION['idkh'])) {
     header("Location: index.php?page=login");
