@@ -2,15 +2,17 @@
 $db = new database();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
+    ob_clean();
+
     $idsp = $_POST['idsp'];
     $tensp = $_POST['tensp'];
-    $gia = $_POST['gia'];
+    $gia = (int)$_POST['gia'];
     $hinhanh = $_POST['hinhanh'];
     $soluong = (int)$_POST['soluong'];
-    $da = $_POST['da'];
-    $duong = $_POST['duong'];
-    $size = $_POST['size'];
-    $ghichu = trim($_POST['ghichu']);
+    $da = $_POST['da'] ?? '';
+    $duong = $_POST['duong'] ?? '';
+    $size = $_POST['size'] ?? 'M';
+    $ghichu = trim($_POST['ghichu'] ?? '');
 
     if (!isset($_SESSION['cart'])) $_SESSION['cart'] = [];
 
@@ -31,12 +33,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
         ];
     }
 
+    header('Content-Type: application/json');
     echo json_encode(['success' => true]);
     exit;
 }
 ?>
 
+
 <title>Trang chủ</title>
+
 <main class="flex-1 container mx-auto px-4 py-12">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
         <div>
@@ -98,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
 
             <img id="modalImage" src="" alt="Sản phẩm">
             <h3 id="modalName"></h3>
-            <p id="modalPrice"></p>
+            <p id="modalPrice" class="text-orange-600 font-bold text-lg"></p>
 
             <form id="modalForm" method="POST" class="modal-form">
                 <input type="hidden" name="idsp" id="modalId">
@@ -116,18 +121,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
                 <div class="option-group">
                     <p>Lượng đường:</p>
                     <label><input type="radio" name="duong" value="Không đường" checked> Không đường</label>
-                    <label><input type="radio" name="duong" value="Ít đường" checked> Ít</label>
+                    <label><input type="radio" name="duong" value="Ít đường"> Ít</label>
                     <label><input type="radio" name="duong" value="Vừa đường"> Vừa</label>
                     <label><input type="radio" name="duong" value="Nhiều đường"> Nhiều</label>
                 </div>
 
                 <div class="option-group">
-                    <p>Size</p>
+                    <p>Size:</p>
                     <label><input type="radio" name="size" value="M" checked> Size M</label>
                     <label><input type="radio" name="size" value="L"> Size L</label>
                 </div>
-
-
 
                 <div class="option-group">
                     <p>Ghi chú:</p>
@@ -136,90 +139,95 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
 
                 <div class="option-group">
                     <p>Số lượng:</p>
-                    <input id="modalQty" type="number" name="soluong" 
-                    value="1" min="1" step="1"
-                    class="w-full text-center border rounded-lg p-2 
-                    focus:outline-none focus:ring-2 focus:ring-orange-400 mb-2">
+                    <input id="modalQty" type="number" name="soluong" value="1" min="1" step="1"
+                        class="w-full text-center border rounded-lg p-2 
+                        focus:outline-none focus:ring-2 focus:ring-orange-400 mb-2">
                 </div>
 
-                <button type="submit" name="add_cart" class="submit-btn">Thêm vào giỏ hàng</button>
+                <button type="submit" name="add_cart" class="submit-btn bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition">
+                    🛒 Thêm vào giỏ hàng
+                </button>
             </form>
         </div>
     </div>
 
-    <div id="toast" class="fixed top-6 right-6 bg-green-500 text-white px-5 py-3 rounded-lg shadow-lg hidden transition-opacity duration-500">
+    <div id="cartMessage" class="fixed top-6 right-6 bg-green-500 text-white px-5 py-3 rounded-lg shadow-lg hidden transition-opacity duration-500">
         ✅ Thêm vào giỏ hàng thành công!
     </div>
-
-    <link rel="stylesheet" href="assets/css/modal.css?v=2">
-
-<style>
-#cartMessage.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-</style>
-
-<div id="cartMessage"></div>
-
-<script>
-function openModal(idsp, name, price, img) {
-  const modal = document.getElementById('productModal');
-  modal.style.display = 'flex';
-  document.getElementById('modalImage').src = './assets/images/' + img;
-  document.getElementById('modalName').innerText = name;
-  document.getElementById('modalPrice').innerText = new Intl.NumberFormat('vi-VN').format(price) + ' VNĐ';
-  
-  document.getElementById('modalId').value = idsp;
-  document.getElementById('modalNameInput').value = name;
-  document.getElementById('modalPriceInput').value = price;
-  document.getElementById('modalImgInput').value = img;
-  document.getElementById('modalQty').value = 1;
-}
-
-function closeModal() {
-  document.getElementById('productModal').style.display = 'none';
-}
-
-function showCartMessage(message) {
-  const msg = document.getElementById('cartMessage');
-  msg.innerText = message;
-  msg.classList.add('show');
-  msg.style.display = 'block';
-  setTimeout(() => {
-    msg.classList.remove('show');
-    setTimeout(() => msg.style.display = 'none', 300);
-  }, 2000);
-}
-
-document.getElementById('modalForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
-
-  const formData = new FormData(this);
-  formData.append('add_cart', '1');
-
-  try {
-    const response = await fetch(window.location.href, {
-      method: 'POST',
-      body: formData
-    });
-    const text = await response.text();
-
-    closeModal();
-    showCartMessage('✅ Đã thêm sản phẩm vào giỏ hàng!');
-  } catch (error) {
-    showCartMessage('❌ Lỗi! Không thể thêm sản phẩm.');
-  }
-});
-
-document.getElementById('modalQty').addEventListener('input', function (e) {
-    this.value = this.value.replace(/[^0-9]/g, '');
-    if (this.value === '' || parseInt(this.value) < 1) {
-        this.value = 1;
-    }
-});
-
-</script>
-
 </main>
 
+<link rel="stylesheet" href="assets/css/modal.css?v=3">
+
+<script>
+let basePrice = 0;
+
+function openModal(idsp, name, price, img){
+    const modal = document.getElementById('productModal');
+    modal.style.display = 'flex';
+
+    basePrice = Number(price);
+    document.getElementById('modalImage').src = './assets/images/' + img;
+    document.getElementById('modalName').innerText = name;
+    document.getElementById('modalPrice').innerText = new Intl.NumberFormat('vi-VN').format(price) + ' VNĐ';
+
+    document.getElementById('modalId').value = idsp;
+    document.getElementById('modalNameInput').value = name;
+    document.getElementById('modalPriceInput').value = price;
+    document.getElementById('modalImgInput').value = img;
+    document.getElementById('modalQty').value = 1;
+    updatePrice();
+}
+
+function closeModal(){
+    document.getElementById('productModal').style.display = 'none';
+}
+
+function updatePrice(){
+    const qty = parseInt(document.getElementById('modalQty').value) || 1;
+    const size = document.querySelector('input[name="size"]:checked')?.value || 'M';
+    let price = basePrice;
+    if(size === 'L') price += 5000;
+    const total = price * qty;
+    document.getElementById('modalPrice').innerText = new Intl.NumberFormat('vi-VN').format(total) + ' VNĐ';
+    document.getElementById('modalPriceInput').value = price;
+}
+
+function showCartMessage(message){
+    const msg = document.getElementById('cartMessage');
+    msg.innerText = message;
+    msg.style.display = 'block';
+    msg.style.opacity = '1';
+    setTimeout(()=>{ msg.style.opacity = '0'; }, 2000);
+    setTimeout(()=>{ msg.style.display = 'none'; }, 2600);
+}
+
+document.getElementById('modalQty').addEventListener('input', e=>{
+    e.target.value = e.target.value.replace(/[^0-9]/g, '');
+    if(e.target.value === '' || parseInt(e.target.value) < 1) e.target.value = 1;
+    updatePrice();
+});
+
+document.querySelectorAll('input[name="size"]').forEach(radio=>{
+    radio.addEventListener('change', updatePrice);
+});
+
+document.getElementById('modalForm').addEventListener('submit', async function(e){
+    e.preventDefault();
+    const formData = new FormData(this);
+    formData.append('add_cart', '1');
+
+    try {
+        const res = await fetch(window.location.href, { method:'POST', body: formData });
+        const data = await res.json();
+        if(data.success){
+            closeModal();
+            showCartMessage('✅ Đã thêm sản phẩm vào giỏ hàng!');
+        } else {
+            showCartMessage('❌ Lỗi! Vui lòng thử lại.');
+        }
+    } catch(err){
+        console.error(err);
+        showCartMessage('⚠️ Lỗi kết nối!');
+    }
+});
+</script>
