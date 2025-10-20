@@ -44,11 +44,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
         $subject = "Mã xác nhận đăng ký tài khoản CafeShop";
         $body = "
-            <h2>Xin chào $tenkh,</h2>
-            <p>Cảm ơn bạn đã đăng ký tài khoản tại <b>CafeShop</b>.</p>
-            <p>Mã OTP của bạn là: <b style='font-size:18px;'>$otp</b></p>
-            <p>Mã có hiệu lực trong 5 phút.</p>
-        ";
+    <div style='font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto;'>
+        <h2 style='color: #2C3E50;'>📚 Xin chào $tenKH,</h2>
+        <p>Cảm ơn bạn đã đăng ký tài khoản tại <strong>The Dream</strong></p>
+
+        <p>Để hoàn tất quá trình đăng ký, vui lòng sử dụng mã xác nhận (OTP) bên dưới:</p>
+        
+        <div style='background: #f4f6f8; padding: 15px 20px; border-radius: 8px; 
+                    font-size: 18px; text-align: center; font-weight: bold; color: #2C3E50;
+                    letter-spacing: 3px; border: 1px dashed #3498db;'>
+            $otp
+        </div>
+
+        <p style='margin-top: 15px;'>⏳ <i>Mã OTP có hiệu lực trong <b>5 phút</b>. 
+        Vui lòng không chia sẻ mã này với bất kỳ ai để đảm bảo an toàn tài khoản của bạn.</i></p>
+
+        <p>Trân trọng,<br>
+        <strong>Đội ngũ The Dream</strong><br>
+    </div>
+";
+
 
         if (sendMail($email, $subject, $body)) {
             header("Location: index.php?page=verify_otp");
