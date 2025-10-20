@@ -26,15 +26,7 @@ if (isset($_POST['save_order']) && isset($_SESSION['order'])) {
     $order = $_SESSION['order'];
     $idkh = $_SESSION['idkh'] ?? 1; 
 
-    $last = $obj->xuatdulieu("SELECT iddonban FROM donban ORDER BY iddonban DESC LIMIT 1");
-    if (!empty($last)) {
-        $lastID = $last[0]['iddonban'];
-        $num = (int)substr($lastID, 2) + 1;
-        $newID = 'DB' . str_pad($num, 3, '0', STR_PAD_LEFT);
-    } else {
-        $newID = 'DB001';
-    }
-
+    $newID = generateOrderID($obj);
     $ten = $order['tenkh'];
     $dc = $order['diachi'];
     $sdt = $order['sdt'];
@@ -48,20 +40,23 @@ if (isset($_POST['save_order']) && isset($_SESSION['order'])) {
 
     foreach ($order['cart'] as $item) {
         $idsp = $item['idsp'];
-        $soluong = $item['soluong'];
-        $dongia = $item['gia'];
+        $da = $item['da'] ?? '';
+        $duong = $item['duong'] ?? '';
+        $size = $item['size'] ?? 'M';
+        $ghichu = trim($item['ghichu'] ?? '');
+        $soluong = (int)$item['soluong'];
+        $dongia = (int)$item['gia'];
         $thanhtien = $dongia * $soluong;
 
         $obj->xuatdulieu("
-            INSERT INTO chitietdonban (iddonban, idsp, soluong, dongia, thanhtien)
-            VALUES ('$newID', '$idsp', '$soluong', '$dongia', '$thanhtien')
+            INSERT INTO chitietdonban (iddonban, idsp, da, duong, size, soluong, dongia, thanhtien, ghichu)
+            VALUES ('$newID', '$idsp', '$da', '$duong', '$size', '$soluong', '$dongia', '$thanhtien', '$ghichu')
         ");
     }
 
     unset($_SESSION['order']);
-    echo "<script>alert('Đặt hàng thành công!'); window.location='index.php';</script>";
+    echo "<script>alert('Đặt hàng thành công!'); window.location='index.php?page=menu';</script>";
 }
-
 
 if (isset($_SESSION['order'])) {
     $order = $_SESSION['order'];
@@ -80,7 +75,10 @@ if (isset($_SESSION['order'])) {
             <thead>
                 <tr>
                     <th>Tên sản phẩm</th>
-                    <th>Tùy chọn</th>
+                    <th>Đá</th>
+                    <th>Đường</th>
+                    <th>Size</th>
+                    <th>Ghi chú</th>
                     <th class="text-right">Giá</th>
                     <th class="text-center">Số lượng</th>
                     <th class="text-right">Thành tiền</th>
@@ -90,17 +88,10 @@ if (isset($_SESSION['order'])) {
                 <?php foreach ($order['cart'] as $item): ?>
                 <tr>
                     <td><?= htmlspecialchars($item['tensp']) ?></td>
-                    <td class="options">
-                        <?php
-                        $opts = [];
-                        if(!empty($item['da'])) $opts[] = "Đá: ".htmlspecialchars($item['da']);
-                        if(!empty($item['duong'])) $opts[] = "Đường: ".htmlspecialchars($item['duong']);
-                        if(!empty($item['size'])) $opts[] = "Size: ".htmlspecialchars($item['size']);
-                        if(!empty($item['topping'])) $opts[] = "Topping: ".htmlspecialchars($item['topping']);
-                        if(!empty($item['ghichu'])) $opts[] = "Ghi chú: ".htmlspecialchars($item['ghichu']);
-                        echo !empty($opts) ? implode("<br>", $opts) : "<i style='color:#999;'>Không có</i>";
-                        ?>
-                    </td>
+                    <td><?= !empty($item['da']) ? htmlspecialchars($item['da']) : "<i>Không</i>" ?></td>
+                    <td><?= !empty($item['duong']) ? htmlspecialchars($item['duong']) : "<i>Không</i>" ?></td>
+                    <td><?= htmlspecialchars($item['size'] ?? 'M') ?></td>
+                    <td><?= !empty($item['ghichu']) ? htmlspecialchars($item['ghichu']) : "<i>Không</i>" ?></td>
                     <td class="text-right"><?= number_format($item['gia']) ?>₫</td>
                     <td class="text-center"><?= $item['soluong'] ?></td>
                     <td class="text-right"><?= number_format($item['gia'] * $item['soluong']) ?>₫</td>
@@ -109,22 +100,22 @@ if (isset($_SESSION['order'])) {
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="4">Tổng cộng</td>
-                    <td><?= number_format($order['tongtien']) ?>₫</td>
+                    <td colspan="7" style="text-align:right;">Tổng cộng</td>
+                    <td class="text-right"><?= number_format($order['tongtien']) ?>₫</td>
                 </tr>
             </tfoot>
         </table>
     </div>
 
     <form method="POST">
-    <button type="submit" name="save_order" class="btn-save-order">Xác nhận đặt hàng</button>
-</form>
+        <button type="submit" name="save_order" class="btn-save-order">Xác nhận đặt hàng</button>
+    </form>
 </div>
 <?php } ?>
 
 <style>
 .order-container {
-    max-width: 800px;
+    max-width: 900px;
     margin: 40px auto;
     padding: 20px;
     font-family: Arial, sans-serif;
@@ -151,13 +142,16 @@ if (isset($_SESSION['order'])) {
     margin: 6px 0;
     font-size: 16px;
 }
-table { width: 100%; border-collapse: collapse; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
 thead { background: #ffe0b3; color: #333; }
 th, td {
-    padding: 12px 10px;
+    padding: 10px 8px;
     border: 1px solid #ddd;
-    vertical-align: top;
+    vertical-align: middle;
 }
+th { text-align: center; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
 tfoot td {
     font-weight: bold;
     background: #f2f2f2;
