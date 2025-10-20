@@ -35,6 +35,17 @@
             }
             return 0;
         }
+
+        public function themxoasua($sql) {
+    $link = $this->ketnoi();
+    if ($link->query($sql) === TRUE) {
+        return true; 
+    } else {
+        echo "<p style='color:red;'>Lỗi SQL: " . $link->error . "</p>";
+        return false;
+    }
+}
+
         
 
     }
