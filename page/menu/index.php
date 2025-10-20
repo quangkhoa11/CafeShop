@@ -107,6 +107,7 @@ if ($sanpham) {
 
                 <div class="option-group">
                     <p>Lượng đường:</p>
+                    <label><input type="radio" name="duong" value="Không đường" checked> Không đường</label>
                     <label><input type="radio" name="duong" value="Ít đường" checked> Ít</label>
                     <label><input type="radio" name="duong" value="Vừa đường"> Vừa</label>
                     <label><input type="radio" name="duong" value="Nhiều đường"> Nhiều</label>
@@ -122,7 +123,7 @@ if ($sanpham) {
 
             <div class="option-group">
                 <p>Ghi chú:</p>
-                <textarea name="ghichu" placeholder="Ví dụ: không đá, thêm sữa..." class="w-full border rounded-lg p-2 text-sm mb-2"></textarea>
+                <textarea name="ghichu" class="w-full border rounded-lg p-2 text-sm mb-2"></textarea>
             </div>
 
             <div class="option-group">
@@ -142,7 +143,7 @@ if ($sanpham) {
     <span id="cartMessageText">Đã thêm vào giỏ hàng!</span>
 </div>
 
-<link rel="stylesheet" href="assets/css/modal.css">
+<link rel="stylesheet" href="assets/css/modal.css?v=2">
 
 <script>
 function openModal(idsp, name, price, img, idloai){
