@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 03, 2025 lúc 03:47 AM
+-- Thời gian đã tạo: Th10 20, 2025 lúc 10:53 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -24,24 +24,52 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Cấu trúc bảng cho bảng `chitietdonban`
+--
+
+CREATE TABLE `chitietdonban` (
+  `idchitietdb` int(11) NOT NULL,
+  `iddonban` varchar(10) DEFAULT NULL,
+  `idsp` int(11) DEFAULT NULL,
+  `da` varchar(100) DEFAULT NULL,
+  `duong` varchar(100) DEFAULT NULL,
+  `size` varchar(100) DEFAULT NULL,
+  `soluong` int(11) NOT NULL,
+  `dongia` int(11) NOT NULL,
+  `thanhtien` int(11) NOT NULL,
+  `ghichu` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `donban`
+--
+
+CREATE TABLE `donban` (
+  `iddonban` varchar(10) NOT NULL,
+  `idkh` int(11) DEFAULT NULL,
+  `ngayban` date NOT NULL,
+  `tennguoinhan` varchar(100) NOT NULL,
+  `sdtnguoinhan` varchar(18) NOT NULL,
+  `diachinhan` varchar(100) NOT NULL,
+  `tongtien` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `khachhang`
 --
 
 CREATE TABLE `khachhang` (
   `idkh` int(11) NOT NULL,
   `tenkh` varchar(40) NOT NULL,
-  `sdt` varchar(13) NOT NULL,
+  `sdt` varchar(18) NOT NULL,
   `diachi` varchar(40) NOT NULL,
   `email` varchar(40) NOT NULL,
   `matkhau` varchar(40) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
---
--- Đang đổ dữ liệu cho bảng `khachhang`
---
-
-INSERT INTO `khachhang` (`idkh`, `tenkh`, `sdt`, `diachi`, `email`, `matkhau`) VALUES
-(2, 'Văn A', '0932424327', 'Việt Nam', 'dshdhsds@gmail.com', '12345');
 
 -- --------------------------------------------------------
 
@@ -56,7 +84,7 @@ CREATE TABLE `loaisp` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `loaisp` a
+-- Đang đổ dữ liệu cho bảng `loaisp`
 --
 
 INSERT INTO `loaisp` (`idloai`, `tenloai`, `mota`) VALUES
@@ -98,11 +126,25 @@ INSERT INTO `sanpham` (`idsp`, `idloai`, `tensp`, `gia`, `mota`, `hinhanh`) VALU
 --
 
 --
+-- Chỉ mục cho bảng `chitietdonban`
+--
+ALTER TABLE `chitietdonban`
+  ADD PRIMARY KEY (`idchitietdb`),
+  ADD KEY `iddonban` (`iddonban`),
+  ADD KEY `idsp` (`idsp`);
+
+--
+-- Chỉ mục cho bảng `donban`
+--
+ALTER TABLE `donban`
+  ADD PRIMARY KEY (`iddonban`),
+  ADD KEY `idkh` (`idkh`);
+
+--
 -- Chỉ mục cho bảng `khachhang`
 --
 ALTER TABLE `khachhang`
   ADD PRIMARY KEY (`idkh`),
-  ADD UNIQUE KEY `sdt` (`sdt`),
   ADD UNIQUE KEY `email` (`email`);
 
 --
@@ -123,10 +165,16 @@ ALTER TABLE `sanpham`
 --
 
 --
+-- AUTO_INCREMENT cho bảng `chitietdonban`
+--
+ALTER TABLE `chitietdonban`
+  MODIFY `idchitietdb` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT cho bảng `khachhang`
 --
 ALTER TABLE `khachhang`
-  MODIFY `idkh` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `idkh` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT cho bảng `loaisp`
@@ -143,6 +191,19 @@ ALTER TABLE `sanpham`
 --
 -- Các ràng buộc cho các bảng đã đổ
 --
+
+--
+-- Các ràng buộc cho bảng `chitietdonban`
+--
+ALTER TABLE `chitietdonban`
+  ADD CONSTRAINT `chitietdonban_ibfk_1` FOREIGN KEY (`iddonban`) REFERENCES `donban` (`iddonban`),
+  ADD CONSTRAINT `chitietdonban_ibfk_2` FOREIGN KEY (`idsp`) REFERENCES `sanpham` (`idsp`);
+
+--
+-- Các ràng buộc cho bảng `donban`
+--
+ALTER TABLE `donban`
+  ADD CONSTRAINT `donban_ibfk_1` FOREIGN KEY (`idkh`) REFERENCES `khachhang` (`idkh`);
 
 --
 -- Các ràng buộc cho bảng `sanpham`
