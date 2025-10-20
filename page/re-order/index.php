@@ -120,7 +120,7 @@ if (isset($_SESSION['order'])) {
                     <td><?= htmlspecialchars($item['da']) ?></td>
                     <td><?= htmlspecialchars($item['duong']) ?></td>
                     <td><?= htmlspecialchars($item['size']) ?></td>
-                    <td><?= htmlspecialchars($item['ghichu'] ?: '-') ?></td>
+                    <td><?= htmlspecialchars($item['ghichu']) ?></td>
                     <td class="text-center"><?= $item['soluong'] ?></td>
                     <td class="text-right"><?= number_format($item['gia']) ?>₫</td>
                     <td class="text-right"><?= number_format($item['gia'] * $item['soluong']) ?>₫</td>
