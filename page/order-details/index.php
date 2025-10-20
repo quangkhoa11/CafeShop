@@ -34,34 +34,44 @@ if (isset($_POST['save_order']) && isset($_SESSION['order'])) {
     $tong = $order['tongtien'];
     $ngayban = date('Y-m-d H:i:s');
 
-    $obj->xuatdulieu("
+    $sql_donban = "
         INSERT INTO donban (iddonban, idkh, ngayban, tennguoinhan, sdtnguoinhan, diachinhan, tongtien)
         VALUES ('$newID', '$idkh', '$ngayban', '$ten', '$sdt', '$dc', '$tong')
-    ");
+    ";
+    $save_donban = $obj->themxoasua($sql_donban);
 
-    foreach ($order['cart'] as $item) {
-        $idsp = $item['idsp'];
-        $da = $item['da'] ?? '';
-        $duong = $item['duong'] ?? '';
-        $size = $item['size'] ?? 'M';
-        $ghichu = trim($item['ghichu'] ?? '');
-        $soluong = (int)$item['soluong'];
-        $dongia = (int)$item['gia'];
-        $thanhtien = $dongia * $soluong;
+    if ($save_donban) {
+        foreach ($order['cart'] as $item) {
+            $idsp = $item['idsp'];
+            $da = $item['da'] ?? '';
+            $duong = $item['duong'] ?? '';
+            $size = $item['size'] ?? 'M';
+            $ghichu = trim($item['ghichu'] ?? '');
+            $soluong = (int)$item['soluong'];
+            $dongia = (int)$item['gia'];
+            $thanhtien = $dongia * $soluong;
 
-        $obj->xuatdulieu("
-            INSERT INTO chitietdonban (iddonban, idsp, da, duong, size, soluong, dongia, thanhtien, ghichu)
-            VALUES ('$newID', '$idsp', '$da', '$duong', '$size', '$soluong', '$dongia', '$thanhtien', '$ghichu')
-        ");
+            $sql_chitiet = "
+                INSERT INTO chitietdonban (iddonban, idsp, da, duong, size, soluong, dongia, thanhtien, ghichu)
+                VALUES ('$newID', '$idsp', '$da', '$duong', '$size', '$soluong', '$dongia', '$thanhtien', '$ghichu')
+            ";
+            $obj->themxoasua($sql_chitiet);
+        }
+
+        unset($_SESSION['order']);
+        echo "<script>alert('Đặt hàng thành công!'); window.location='index.php?page=menu';</script>";
+        exit();
+    } else {
+        echo "<p style='color:red;'>Lỗi khi lưu đơn hàng. Vui lòng thử lại.</p>";
     }
-
-    unset($_SESSION['order']);
-    echo "<script>alert('Đặt hàng thành công!'); window.location='index.php?page=menu';</script>";
 }
 
 if (isset($_SESSION['order'])) {
     $order = $_SESSION['order'];
+}
 ?>
+
+<?php if(isset($order)): ?>
 <div class="order-container">
     <h1 class="order-title">CHI TIẾT ĐƠN HÀNG</h1>
 
@@ -89,10 +99,10 @@ if (isset($_SESSION['order'])) {
                 <?php foreach ($order['cart'] as $item): ?>
                 <tr>
                     <td><?= htmlspecialchars($item['tensp']) ?></td>
-                    <td><?= !empty($item['da']) ? htmlspecialchars($item['da']) : "<i>Không</i>" ?></td>
-                    <td><?= !empty($item['duong']) ? htmlspecialchars($item['duong']) : "<i>Không</i>" ?></td>
+                    <td><?= htmlspecialchars($item['da'] ?? '-') ?></td>
+                    <td><?= htmlspecialchars($item['duong'] ?? '-') ?></td>
                     <td><?= htmlspecialchars($item['size'] ?? 'M') ?></td>
-                    <td><?= !empty($item['ghichu']) ? htmlspecialchars($item['ghichu']) : "<i>Không</i>" ?></td>
+                    <td><?= htmlspecialchars($item['ghichu'] ?? '-') ?></td>
                     <td class="text-right"><?= number_format($item['gia']) ?>₫</td>
                     <td class="text-center"><?= $item['soluong'] ?></td>
                     <td class="text-right"><?= number_format($item['gia'] * $item['soluong']) ?>₫</td>
@@ -112,7 +122,7 @@ if (isset($_SESSION['order'])) {
         <button type="submit" name="save_order" class="btn-save-order">Xác nhận đặt hàng</button>
     </form>
 </div>
-<?php } ?>
+<?php endif; ?>
 
 <style>
 .order-container {
