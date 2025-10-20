@@ -146,9 +146,14 @@ if ($sanpham) {
 <link rel="stylesheet" href="assets/css/modal.css?v=2">
 
 <script>
+let basePrice = 0; 
+
 function openModal(idsp, name, price, img, idloai){
     const modal = document.getElementById('productModal');
     modal.style.display = 'flex';
+    
+    basePrice = Number(price);
+    
     document.getElementById('modalImage').src = './assets/images/' + img;
     document.getElementById('modalName').innerText = name;
     document.getElementById('modalPrice').innerText = new Intl.NumberFormat('vi-VN').format(price) + ' VNĐ';
@@ -161,14 +166,12 @@ function openModal(idsp, name, price, img, idloai){
     document.getElementById('modalQty').value = 1;
 
     const daDuongSection = document.getElementById('daDuongSection');
-    if (idloai == 3) {
-        daDuongSection.style.display = 'block';
-    } else {
-        daDuongSection.style.display = 'none';
-    }
+    daDuongSection.style.display = (idloai == 3) ? 'block' : 'none';
 
-    document.querySelectorAll('#productModal input[type=radio]').forEach(r=>r.checked=r.defaultChecked);
-    document.querySelector('#productModal textarea').value='';
+    document.querySelectorAll('#productModal input[type=radio]').forEach(r => r.checked = r.defaultChecked);
+    document.querySelector('#productModal textarea').value = '';
+
+    updateModalPrice(); 
 }
 
 function closeModal(){
@@ -182,9 +185,23 @@ function showCartMessage(text){
 
     msg.style.display = 'block';
     msg.style.opacity = '1';
-
     setTimeout(()=>{ msg.style.opacity = '0'; }, 2000);
     setTimeout(()=>{ msg.style.display = 'none'; }, 2600);
+}
+
+function updateModalPrice(){
+    const size = document.querySelector('input[name="size"]:checked')?.value || 'M';
+    const qty = Number(document.getElementById('modalQty').value) || 1;
+
+    let currentPrice = basePrice;
+    if (size === 'L') {
+        currentPrice += 5000;
+    }
+
+    const total = currentPrice * qty;
+
+    document.getElementById('modalPrice').innerText = new Intl.NumberFormat('vi-VN').format(total) + ' VNĐ';
+    document.getElementById('modalPriceInput').value = currentPrice;
 }
 
 function addToCartModal(event){
@@ -192,26 +209,25 @@ function addToCartModal(event){
 
     const idsp = document.getElementById('modalId').value;
     const tensp = document.getElementById('modalNameInput').value;
-    const gia = document.getElementById('modalPriceInput').value;
+    const gia = Number(document.getElementById('modalPriceInput').value); 
     const hinhanh = document.getElementById('modalImgInput').value;
-    const soluong = document.getElementById('modalQty').value;
+    const soluong = Number(document.getElementById('modalQty').value);
     const idloai = document.getElementById('modalLoai').value;
 
-    let da = '';
-    let duong = '';
-    let size = '';
+    let da = '', duong = '', size = '';
     if (idloai == 3) {
         da = document.querySelector('input[name="da"]:checked').value;
         duong = document.querySelector('input[name="duong"]:checked').value;
         size = document.querySelector('input[name="size"]:checked').value;
     }
 
-    const ghichu = document.querySelector('textarea[name="ghichu"]').value;
-
+    const ghichu = document.querySelector('textarea[name="ghichu"]').value.trim();
     if (soluong < 1) { 
         alert('Số lượng phải >= 1'); 
         return false; 
     }
+
+    const thanhtien = gia * soluong;
 
     const formData = new URLSearchParams({
         add_cart: 1,
@@ -224,7 +240,8 @@ function addToCartModal(event){
         da: da,
         duong: duong,
         size: size,
-        ghichu: ghichu
+        ghichu: ghichu,
+        thanhtien: thanhtien
     });
 
     fetch(window.location.href, {
@@ -252,6 +269,10 @@ document.getElementById('modalQty').addEventListener('input', function (e) {
     if (this.value === '' || parseInt(this.value) < 1) {
         this.value = 1;
     }
+    updateModalPrice();
 });
 
+document.querySelectorAll('input[name="size"]').forEach(radio => {
+    radio.addEventListener('change', updateModalPrice);
+});
 </script>
