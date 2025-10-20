@@ -5,6 +5,16 @@ if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
+$khachhang_info = null;
+if (isset($_SESSION['idkh'])) {
+    $idkh = $_SESSION['idkh'];
+    $query = "SELECT tenkh, diachi, sdt, email FROM khachhang WHERE idkh = '$idkh'";
+    $result = $obj->xuatdulieu($query);
+    if (!empty($result)) {
+        $khachhang_info = $result[0];
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
     $idsp = $_POST['idsp'];
     $tensp = $_POST['tensp'];
@@ -38,7 +48,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
 ?>
 
 <main class="flex-1 py-10 container mx-auto px-4">
-  <div style="padding-top: 40px;"><h1 class="text-3xl font-bold text-center text-orange-600 mb-6 drop-shadow">GIỎ HÀNG</h1></div>
+  <div style="padding-top: 40px;">
+    <h1 class="text-3xl font-bold text-center text-orange-600 mb-6 drop-shadow">GIỎ HÀNG</h1>
+  </div>
 
   <?php if (!empty($_SESSION['cart'])): ?>
   <div id="cart-container" class="table-wrapper overflow-x-auto bg-white shadow-lg rounded-lg p-5 border border-gray-200">
@@ -105,22 +117,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
 
     <div id="checkoutForm" class="hidden checkout-form">
         <h2>Thông tin giao hàng</h2>
+
+        <button type="button" id="btnUseAccount" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded mb-3">
+            🧭 Dùng địa chỉ tài khoản
+        </button>
+
         <form id="formCheckout" method="post" action="index.php?page=order-details">
             <div class="form-group">
                 <label>Họ và tên:</label>
-                <input type="text" name="tenkh" required placeholder="Nhập họ và tên">
+                <input type="text" id="tenkh" name="tenkh" required placeholder="Nhập họ và tên">
             </div>
             <div class="form-group">
                 <label>Địa chỉ:</label>
-                <input type="text" name="diachi" required placeholder="Nhập địa chỉ giao hàng">
+                <input type="text" id="diachi" name="diachi" required placeholder="Nhập địa chỉ giao hàng">
             </div>
             <div class="form-group">
                 <label>Số điện thoại:</label>
-                <input type="tel" name="sdt" required pattern="[0-9]{10}" placeholder="Nhập số điện thoại">
+                <input type="tel" id="sdt" name="sdt" required pattern="[0-9]{10}" placeholder="Nhập số điện thoại">
             </div>
             <button type="submit" name="confirm_order">Xác nhận đơn hàng</button>
         </form>
     </div>
+
+    <script>
+      const khachhangData = <?php echo json_encode($khachhang_info); ?>;
+      document.getElementById('btnUseAccount')?.addEventListener('click', () => {
+          if (khachhangData) {
+              document.getElementById('tenkh').value = khachhangData.tenkh || '';
+              document.getElementById('diachi').value = khachhangData.diachi || '';
+              document.getElementById('sdt').value = khachhangData.sdt || '';
+          } else {
+              alert("Không thể lấy thông tin tài khoản.");
+          }
+      });
+    </script>
+
 <?php else: ?>
     <p class="text-center text-red-500 font-semibold mt-4">
         Vui lòng <a href="index.php?page=login" class="underline text-orange-500">đăng nhập</a> để thanh toán
@@ -134,6 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
     <p class="text-center text-gray-500 mt-8 text-lg italic">Giỏ hàng hiện tại trống 😢</p>
   <?php endif; ?>
 </main>
+
 
 <script>
   document.getElementById('checkoutBtn')?.addEventListener('click', () => {
