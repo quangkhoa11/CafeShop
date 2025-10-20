@@ -127,7 +127,10 @@ if ($sanpham) {
 
             <div class="option-group">
                 <p>Số lượng:</p>
-                <input id="modalQty" type="number" name="soluong" value="1" min="1" class="w-full text-center border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-400 mb-2">
+                <input id="modalQty" type="number" name="soluong" 
+                value="1" min="1" step="1"
+                class="w-full text-center border rounded-lg p-2 
+              focus:outline-none focus:ring-2 focus:ring-orange-400 mb-2">
             </div>
 
             <button type="submit" class="bg-orange-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-orange-600">Thêm vào giỏ hàng</button>
@@ -242,4 +245,12 @@ function addToCartModal(event){
         alert('Lỗi kết nối đến server!');
     });
 }
+
+document.getElementById('modalQty').addEventListener('input', function (e) {
+    this.value = this.value.replace(/[^0-9]/g, '');
+    if (this.value === '' || parseInt(this.value) < 1) {
+        this.value = 1;
+    }
+});
+
 </script>

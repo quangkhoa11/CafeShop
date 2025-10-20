@@ -135,8 +135,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
 
                 <div class="option-group">
                     <p>Số lượng:</p>
-                    <input id="modalQty" type="number" name="soluong" value="1" min="1"
-                           class="w-full text-center border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-400">
+                    <input id="modalQty" type="number" name="soluong" 
+                    value="1" min="1" step="1"
+                    class="w-full text-center border rounded-lg p-2 
+                    focus:outline-none focus:ring-2 focus:ring-orange-400 mb-2">
                 </div>
 
                 <button type="submit" name="add_cart" class="submit-btn">Thêm vào giỏ hàng</button>
@@ -208,6 +210,14 @@ document.getElementById('modalForm').addEventListener('submit', async function(e
     showCartMessage('❌ Lỗi! Không thể thêm sản phẩm.');
   }
 });
+
+document.getElementById('modalQty').addEventListener('input', function (e) {
+    this.value = this.value.replace(/[^0-9]/g, '');
+    if (this.value === '' || parseInt(this.value) < 1) {
+        this.value = 1;
+    }
+});
+
 </script>
 
 </main>
