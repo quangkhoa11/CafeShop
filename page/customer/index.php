@@ -1,5 +1,6 @@
-<title>Thông tin khách hàng</title>
+<title>Thông tin cá nhân</title>
 <?php
+
 if (!isset($_SESSION['idkh'])) {
     header("Location: index.php?page=login");
     exit;
@@ -10,143 +11,161 @@ $db = new database();
 
 $kh = $db->xuatdulieu("SELECT * FROM khachhang WHERE idkh = $idkh");
 $kh = $kh ? $kh[0] : null;
-
-$donhang = $db->xuatdulieu("
-    SELECT db.iddonban, db.ngayban, db.tongtien
-    FROM donban db
-    WHERE db.idkh = '$idkh'
-    ORDER BY db.iddonban DESC
-");
 ?>
 
-<div class="lichsu-container">
-    <h2>Thông tin khách hàng</h2>
+<div class="profile-container">
+    <h2>Thông tin cá nhân</h2>
 
     <?php if ($kh): ?>
-        <div class="khachhang-box">
-            <p><b>Tên khách hàng:</b> <?= htmlspecialchars($kh['tenkh']) ?></p>
-            <p><b>Email:</b> <?= htmlspecialchars($kh['email']) ?></p>
-            <p><b>Số điện thoại:</b> <?= htmlspecialchars($kh['sdt']) ?></p>
-            <p><b>Địa chỉ:</b> <?= htmlspecialchars($kh['diachi']) ?></p>
+        <div class="profile-card">
+            <div class="profile-left">
+                <img src="assets/images/icon.png" alt="Avatar" class="avatar">
+            </div>
+            <div class="profile-right">
+                <div class="info-item">
+                    <label>Họ và tên:</label>
+                    <span><?= htmlspecialchars($kh['tenkh']) ?></span>
+                </div>
+                <div class="info-item">
+                    <label>Email:</label>
+                    <span><?= htmlspecialchars($kh['email']) ?></span>
+                </div>
+                <div class="info-item">
+                    <label>Số điện thoại:</label>
+                    <span><?= htmlspecialchars($kh['sdt']) ?></span>
+                </div>
+                <div class="info-item">
+                    <label>Địa chỉ:</label>
+                    <span><?= htmlspecialchars($kh['diachi']) ?></span>
+                </div>
+            </div>
         </div>
-    <?php endif; ?>
 
-    <h3>Lịch sử đặt hàng</h3>
-
-    <?php if ($donhang && count($donhang) > 0): ?>
-        <table class="lichsu-table">
-            <thead>
-                <tr>
-                    <th>Mã đơn</th>
-                    <th>Ngày đặt</th>
-                    <th>Tổng tiền</th>
-                    <th>Chi tiết</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($donhang as $d): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($d['iddonban']) ?></td>
-                        <td><?= date('d/m/Y', strtotime($d['ngayban'])) ?></td>
-                        <td><?= number_format($d['tongtien'], 0, ',', '.') ?>₫</td>
-                        <td>
-                            <a href="index.php?page=history&iddonban=<?= urlencode($d['iddonban']) ?>" class="btn-view">Xem chi tiết</a>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+        <div class="btn-group">
+            <a href="#" class="btn-edit">✏️ Chỉnh sửa thông tin</a>
+        </div>
     <?php else: ?>
-        <p class="no-order">Bạn chưa có đơn hàng nào.</p>
+        <p class="no-info">Không tìm thấy thông tin khách hàng.</p>
     <?php endif; ?>
 </div>
 
 <style>
-.lichsu-container {
+.profile-container {
     max-width: 900px;
-    margin: 40px auto;
-    padding: 20px;
+    margin: 60px auto;
     background: #fffaf2;
-    font-family: Arial, sans-serif;
-    color: #333;
+    padding: 35px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    transition: all 0.3s ease;
 }
 
-.lichsu-container h2 {
-    font-size: 26px;
-    font-weight: bold;
-    color: #ff6600;
+.profile-container:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.profile-container h2 {
     text-align: center;
-    border-bottom: 3px solid #ff6600;
-    padding-bottom: 10px;
-    margin-bottom: 25px;
-}
-
-.khachhang-box {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 35px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.khachhang-box p {
-    margin: 8px 0;
-    font-size: 16px;
-}
-
-.lichsu-container h3 {
-    font-size: 22px;
+    font-size: 28px;
     color: #ff6600;
+    border-bottom: 3px solid #ff6600;
+    padding-bottom: 12px;
+    margin-bottom: 30px;
+    font-weight: 700;
+}
+
+.profile-card {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 12px;
+    padding: 25px 30px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    border: 1px solid #f3d9b1;
+}
+
+.profile-left {
+    flex: 0 0 140px;
+    text-align: center;
+}
+
+.avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid #ff6600;
+    object-fit: cover;
+    background: #fff;
+}
+
+.profile-right {
+    flex: 1;
+    padding-left: 30px;
+}
+
+.info-item {
     margin-bottom: 15px;
 }
 
-.lichsu-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+.info-item label {
+    display: block;
+    color: #555;
+    font-weight: bold;
+    margin-bottom: 3px;
 }
 
-.lichsu-table th, .lichsu-table td {
-    border: 1px solid #ddd;
-    padding: 12px 15px;
-    text-align: left;
-}
-
-.lichsu-table thead {
-    background: #ffe0b3;
+.info-item span {
+    display: inline-block;
+    font-size: 16px;
     color: #333;
+    background: #fff8ec;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ffe1b3;
 }
 
-.lichsu-table tbody tr:nth-child(even) {
-    background: #fff7e6;
+.btn-group {
+    text-align: center;
+    margin-top: 30px;
 }
 
-.lichsu-table tbody tr:hover {
-    background: #fff0d6;
+.btn-view, .btn-edit {
+    display: inline-block;
+    padding: 12px 25px;
+    margin: 0 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.btn-edit {
+    background: #ff6600;
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #e85d00;
+    transform: scale(1.05);
 }
 
 .btn-view {
-    background: #ff6600;
-    color: white;
-    padding: 6px 10px;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: background 0.2s ease;
+    background: #fff;
+    color: #ff6600;
+    border: 2px solid #ff6600;
 }
 
 .btn-view:hover {
-    background: #e05500;
+    background: #ff6600;
+    color: white;
+    transform: scale(1.05);
 }
 
-.no-order {
+.no-info {
     text-align: center;
+    color: #777;
     font-size: 16px;
-    color: #888;
-    margin-top: 30px;
+    margin-top: 20px;
 }
 </style>
