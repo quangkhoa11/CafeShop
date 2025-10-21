@@ -24,7 +24,7 @@ if (empty($donban)) {
 $don = $donban[0];
 
 $chitiet = $db->xuatdulieu("
-    SELECT sp.tensp, sp.hinhanh, ctdb.soluong, da, duong, size, ctdb.dongia, ctdb.thanhtien
+    SELECT sp.tensp, sp.hinhanh, ctdb.soluong, da, duong, size, ctdb.dongia, ctdb.thanhtien, ghichu
     FROM chitietdonban ctdb
     JOIN sanpham sp ON ctdb.idsp = sp.idsp
     WHERE ctdb.iddonban = '$iddonban'
@@ -55,6 +55,7 @@ $chitiet = $db->xuatdulieu("
                     <th style="text-align:center;">Size</th>
                     <th style="text-align:right;">Đơn giá</th>
                     <th style="text-align:right;">Thành tiền</th>
+                    <th style="text-align:right;">Ghi chú</th>
                 </tr>
             </thead>
             <tbody>
@@ -68,6 +69,7 @@ $chitiet = $db->xuatdulieu("
                         <td style="text-align:center;"><?= $row['size'] ?></td>
                         <td style="text-align:right;"><?= number_format($row['dongia'], 0, ',', '.') ?>₫</td>
                         <td style="text-align:right;"><?= number_format($row['thanhtien'], 0, ',', '.') ?>₫</td>
+                        <td style="text-align:center;"><?= $row['ghichu'] ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

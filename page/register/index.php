@@ -13,15 +13,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     $matkhau2 = $_POST['matkhau2'];
 
     if (!$tenkh) $errors['tenkh'] = "Vui lòng nhập họ và tên.";
-    if (!$sdt)
-        { $errors['sdt'] = "Vui lòng nhập số điện thoại.";
-    } elseif (!preg_match('/^(0[3|5|7|8|9])[0-9]{8}$/', $sdt)) 
-        { $errors['sdt'] = "Số điện thoại không hợp lệ. Vui lòng nhập lại!";
+    
+    if (!$sdt) {
+        $errors['sdt'] = "Vui lòng nhập số điện thoại.";
+    } elseif (!preg_match('/^(0[3|5|7|8|9])[0-9]{8}$/', $sdt)) {
+        $errors['sdt'] = "Số điện thoại không hợp lệ. Vui lòng nhập lại!";
     }
+
     if (!$diachi) $errors['diachi'] = "Vui lòng nhập địa chỉ.";
     if (!$email) $errors['email'] = "Vui lòng nhập email.";
     if (!$matkhau) $errors['matkhau'] = "Vui lòng nhập mật khẩu.";
     if (!$matkhau2) $errors['matkhau2'] = "Vui lòng xác nhận mật khẩu.";
+
+    if ($matkhau && strlen($matkhau) < 8) {
+        $errors['matkhau'] = "Mật khẩu phải có ít nhất 8 ký tự.";
+    } elseif (!preg_match('/[A-Z]/', $matkhau) || !preg_match('/[0-9]/', $matkhau)) {
+        $errors['matkhau'] = "Mật khẩu phải chứa ít nhất 1 chữ hoa và 1 chữ số.";
+    }
 
     if ($matkhau && $matkhau2 && $matkhau !== $matkhau2) {
         $errors['matkhau2'] = "Mật khẩu và xác nhận mật khẩu không trùng nhau.";
@@ -34,40 +42,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     if ($sdt && $obj->xuatdulieu("SELECT idkh FROM khachhang WHERE sdt='$sdt'")) {
         $errors['sdt'] = "Số điện thoại này đã được đăng ký.";
     }
-
     if (empty($errors)) {
         $otp = rand(100000, 999999);
+        $hashedPassword = password_hash($matkhau, PASSWORD_DEFAULT); 
+
         $_SESSION['register_data'] = [
             'tenkh' => $tenkh,
             'sdt' => $sdt,
             'diachi' => $diachi,
             'email' => $email,
-            'matkhau' => $matkhau,
+            'matkhau' => $hashedPassword,
             'otp' => $otp
         ];
 
         $subject = "Mã xác nhận đăng ký tài khoản CafeShop";
         $body = "
-    <div style='font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto;'>
-        <h2 style='color: #2C3E50;'>📚 Xin chào $tenKH,</h2>
-        <p>Cảm ơn bạn đã đăng ký tài khoản tại <strong>The Dream</strong></p>
+        <div style='font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto;'>
+            <h2 style='color: #2C3E50;'>📚 Xin chào $tenkh,</h2>
+            <p>Cảm ơn bạn đã đăng ký tài khoản tại <strong>The Dream</strong></p>
 
-        <p>Để hoàn tất quá trình đăng ký, vui lòng sử dụng mã xác nhận (OTP) bên dưới:</p>
-        
-        <div style='background: #f4f6f8; padding: 15px 20px; border-radius: 8px; 
-                    font-size: 18px; text-align: center; font-weight: bold; color: #2C3E50;
-                    letter-spacing: 3px; border: 1px dashed #3498db;'>
-            $otp
+            <p>Để hoàn tất quá trình đăng ký, vui lòng sử dụng mã xác nhận (OTP) bên dưới:</p>
+            
+            <div style='background: #f4f6f8; padding: 15px 20px; border-radius: 8px; 
+                        font-size: 18px; text-align: center; font-weight: bold; color: #2C3E50;
+                        letter-spacing: 3px; border: 1px dashed #3498db;'>
+                $otp
+            </div>
+
+            <p style='margin-top: 15px;'>⏳ <i>Mã OTP có hiệu lực trong <b>5 phút</b>. 
+            Vui lòng không chia sẻ mã này với bất kỳ ai để đảm bảo an toàn tài khoản của bạn.</i></p>
+
+            <p>Trân trọng,<br>
+            <strong>Đội ngũ The Dream</strong><br>
         </div>
-
-        <p style='margin-top: 15px;'>⏳ <i>Mã OTP có hiệu lực trong <b>5 phút</b>. 
-        Vui lòng không chia sẻ mã này với bất kỳ ai để đảm bảo an toàn tài khoản của bạn.</i></p>
-
-        <p>Trân trọng,<br>
-        <strong>Đội ngũ The Dream</strong><br>
-    </div>
-";
-
+        ";
 
         if (sendMail($email, $subject, $body)) {
             header("Location: index.php?page=verify_otp");
@@ -118,9 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
       <button type="submit" name="register">Đăng ký</button>
     </form>
 
-    <p>
-      Bạn đã có tài khoản? <a href="index.php?page=login">Đăng nhập</a>
-    </p>
+    <p>Bạn đã có tài khoản? <a href="index.php?page=login">Đăng nhập</a></p>
   </div>
 </div>
 <link rel="stylesheet" href="assets/css/register.css">

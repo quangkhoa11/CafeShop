@@ -14,20 +14,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $xacnhan = trim($_POST['xacnhan']);
 
     if ($matkhaucu === '' || $matkhaumoi === '' || $xacnhan === '') {
-        $thongbao = "Vui lòng nhập đầy đủ thông tin.";
+        $thongbao = "⚠️ Vui lòng nhập đầy đủ thông tin.";
     } else {
         $query = "SELECT matkhau FROM khachhang WHERE idkh = $idkh";
         $data = $obj->xuatdulieu($query);
 
-        if ($data && $matkhaucu === $data[0]['matkhau']) {
-            if ($matkhaumoi === $xacnhan) {
-                $obj->xuatdulieu("UPDATE khachhang SET matkhau = '$matkhaumoi' WHERE idkh = $idkh");
-                $thongbao = "Đổi mật khẩu thành công!";
+        if ($data) {
+            $hash_db = $data[0]['matkhau'];
+
+            if (password_verify($matkhaucu, $hash_db)) {
+                if (strlen($matkhaumoi) < 8 || 
+                    !preg_match('/[A-Z]/', $matkhaumoi) || 
+                    !preg_match('/[a-z]/', $matkhaumoi) || 
+                    !preg_match('/[0-9]/', $matkhaumoi)) {
+                    $thongbao = "🔒 Mật khẩu mới phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường và số.";
+                } elseif ($matkhaumoi !== $xacnhan) {
+                    $thongbao = "❌ Mật khẩu xác nhận không khớp.";
+                } else {
+                    $hash_moi = password_hash($matkhaumoi, PASSWORD_BCRYPT);
+                    $obj->themxoasua("UPDATE khachhang SET matkhau = '$hash_moi' WHERE idkh = $idkh");
+                    $thongbao = "✅ Đổi mật khẩu thành công!";
+                }
             } else {
-                $thongbao = "Mật khẩu xác nhận không khớp.";
+                $thongbao = "❌ Mật khẩu cũ không đúng.";
             }
         } else {
-            $thongbao = "Mật khẩu cũ không đúng.";
+            $thongbao = "Không tìm thấy thông tin tài khoản.";
         }
     }
 }
@@ -36,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="container">
     <form method="POST" class="form-box">
         <h2>ĐỔI MẬT KHẨU</h2>
+
         <label>Mật khẩu cũ:</label>
         <input type="password" name="matkhaucu" placeholder="Nhập mật khẩu cũ" required>
 
@@ -128,5 +141,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     padding: 10px;
     font-size: 14px;
 }
-
 </style>

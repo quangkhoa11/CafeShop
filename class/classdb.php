@@ -26,15 +26,22 @@
         }
 
         public function dangnhap($tk, $mk) {
-            $link = $this->ketnoi();
-            $sql = "select idkh from khachhang where email='$tk' and matkhau='$mk'";
-            $result = $link->query($sql);
-            if ($result->num_rows) {
-                $row = $result->fetch_assoc();
-                return reset($row);
+        $link = $this->ketnoi();
+        $sql = "SELECT * FROM khachhang WHERE email = ?";
+        $stmt = $link->prepare($sql);
+        $stmt->bind_param("s", $tk);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            if (password_verify($mk, $row['matkhau'])) {
+                return $row;
             }
-            return 0;
         }
+        return 0;
+    }
+
 
         public function themxoasua($sql) {
     $link = $this->ketnoi();

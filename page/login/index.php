@@ -1,22 +1,27 @@
 <title>Đăng nhập</title>
 <?php
-    $obj=new database();
-    if(isset($_POST['btnDangNhap'])){
-        $tk=$_POST['tk'];
-        $mk=$_POST['mk'];
+$obj = new database();
 
-        $tkmk = $obj->dangnhap($tk, $mk);
-        if ($tkmk) {
-        $_SESSION['dangnhap'] = $tkmk; 
-        $_SESSION['idkh'] = $tkmk;     
-        $_SESSION['username'] = $tk;    
-    header("location:index.php?page=home");
-    exit;
-}
+if (isset($_POST['btnDangNhap'])) {
+    $tk = trim($_POST['tk']);
+    $mk = trim($_POST['mk']);
 
-        echo '<script>alert("Đăng nhập không thành công!");</script>';
+    $user = $obj->dangnhap($tk, $mk);
+
+    if ($user) {
+        $_SESSION['dangnhap'] = true;
+        $_SESSION['idkh'] = $user['idkh'];
+        $_SESSION['username'] = $user['tenkh'];
+        $_SESSION['email'] = $user['email'];
+
+        header("Location: index.php?page=home");
+        exit;
+    } else {
+        echo '<script>alert("Email hoặc mật khẩu không đúng!");</script>';
     }
+}
 ?>
+
 
 <main class="flex-1 flex items-center justify-center py-12">
       <div class="bg-white shadow-xl rounded-2xl p-6 " style="width: 550px">
