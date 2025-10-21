@@ -1,6 +1,11 @@
 <title>Chi tiết đơn hàng <?= htmlspecialchars($_GET['iddonban'] ?? '') ?></title>
 <?php
 
+if (!isset($_SESSION['idkh'])) {
+    echo "<p>⚠️ Vui lòng <a href='index.php?page=login'>đăng nhập</a> để xem chi tiết đơn hàng.</p>";
+    exit;
+}
+
 if (!isset($_GET['iddonban'])) {
     echo "<p>Không tìm thấy đơn hàng.</p>";
     exit;
@@ -31,7 +36,7 @@ $chitiet = $db->xuatdulieu("
 ");
 ?>
 
-<div class="container">
+<div class="content-container">
     <h2 class="text-center mt-4">CHI TIẾT ĐƠN HÀNG: <?= htmlspecialchars($iddonban) ?></h2>
 
     <div class="box">
@@ -82,48 +87,71 @@ $chitiet = $db->xuatdulieu("
 
     <div style="text-align:center; margin-top: 20px; margin-bottom: 20px;">
         <a href="index.php?page=re-order&iddonban=<?= urlencode($iddonban) ?>" class="reorder-btn">Đặt lại đơn hàng</a>
-        <a href="index.php?page=customer" class="reorder-btn">Quay về</a>
+        <a href="index.php?page=order-history" class="reorder-btn">Quay về</a>
     </div>
     
 </div>
 <style>
+.content-center {
+    display: flex;
+    justify-content: center;  
+    align-items: flex-start;
+    flex-direction: column;   
+    min-height: 100vh;        
+    padding: 20px;            
+    background: #fff9f0;      
+}
+
+.content-center .container {
+    width: 100%;
+    max-width: 900px;        
+}
 h2 {
     color: #e65c00;
-    margin-bottom: 25px;
-    font-size: 24px;
+    margin-bottom: 30px;
+    font-size: 26px;
+    text-align: center;
 }
 
 .box {
     background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    padding: 20px 25px;
     margin-bottom: 25px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.12);
 }
 
 .box h3 {
     font-size: 18px;
     color: #444;
     margin-bottom: 15px;
-    border-left: 4px solid #e65c00;
-    padding-left: 8px;
+    border-left: 5px solid #e65c00;
+    padding-left: 10px;
 }
 
 .box p {
     line-height: 1.6;
     color: #333;
-    margin: 5px 0;
+    margin: 6px 0;
+    font-size: 15px;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
+    margin-top: 15px;
+    font-size: 14px;
 }
 
 th, td {
     border: 1px solid #ddd;
-    padding: 10px 12px;
+    padding: 12px 10px;
     text-align: left;
 }
 
@@ -141,7 +169,12 @@ td img {
     width: 70px;
     height: 70px;
     object-fit: cover;
-    border-radius: 6px;
+    border-radius: 8px;
+    transition: transform 0.2s;
+}
+
+td img:hover {
+    transform: scale(1.05);
 }
 
 .total {
@@ -165,13 +198,45 @@ td img {
     padding: 10px 18px;
     border-radius: 8px;
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
     transition: background 0.3s, transform 0.2s;
     text-decoration: none;
+    margin: 5px;
 }
 
 .reorder-btn:hover {
     background: #cc5200;
     transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    table th, table td {
+        padding: 8px 6px;
+        font-size: 13px;
+    }
+
+    td img {
+        width: 55px;
+        height: 55px;
+    }
+
+    .box {
+        padding: 15px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    table {
+        font-size: 12px;
+    }
+
+    .total {
+        font-size: 16px;
+    }
+
+    .total span {
+        font-size: 20px;
+    }
 }
 </style>
