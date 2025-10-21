@@ -141,7 +141,7 @@ if ($sanpham) {
 </div>
 
 <div id="cartMessage" class="fixed bottom-5 right-5 hidden bg-green-500 text-white px-5 py-3 rounded-lg shadow-lg font-medium z-50 transition-opacity duration-500">
-    <span id="cartMessageText">Đã thêm vào giỏ hàng!</span>
+    <span id="cartMessageText">Đã thêm vào giỏ hàng!!</span>
 </div>
 
 <link rel="stylesheet" href="assets/css/modal.css?v=2">
