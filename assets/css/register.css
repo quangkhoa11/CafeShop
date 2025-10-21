@@ -12,7 +12,7 @@
   border-radius: 12px;
   box-shadow: 0 6px 20px rgba(0,0,0,0.1);
   width: 100%;
-  max-width: 400px;
+  max-width: 550px;
 }
 
 .register-box h1 {
@@ -22,20 +22,50 @@
   font-size: 24px;
 }
 
-.register-box label {
-  display: block;
-  font-weight: bold;
+.form-group {
+  margin-bottom: 15px;
+}
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 6px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  gap: 8px;
+}
+
+.label-row label {
+  font-weight: bold;
   color: #333;
+  flex-shrink: 0;
+}
+
+.label-row .error-msg {
+  color: red;
+  font-size: 12px;
+  font-weight: normal;
+  margin-left: auto;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 540px; /* ✅ thêm không gian hiển thị lỗi dài */
 }
 
 .register-box input {
   width: 100%;
   padding: 10px 12px;
-  margin-bottom: 5px;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.register-box input:focus {
+  border-color: #ff6600;
+  outline: none;
 }
 
 .register-box button {
@@ -66,11 +96,4 @@
   color: #ff6600;
   font-weight: bold;
   text-decoration: none;
-}
-
-.error-msg {
-  color: red;
-  font-size: 12px;
-  margin-bottom: 10px;
-  display: block;
 }
