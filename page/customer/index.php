@@ -47,7 +47,7 @@ $donhang = $db->xuatdulieu("
                 <?php foreach ($donhang as $d): ?>
                     <tr>
                         <td><?= htmlspecialchars($d['iddonban']) ?></td>
-                        <td><?= htmlspecialchars($d['ngayban']) ?></td>
+                        <td><?= date('d/m/Y', strtotime($d['ngayban'])) ?></td>
                         <td><?= number_format($d['tongtien'], 0, ',', '.') ?>₫</td>
                         <td>
                             <a href="index.php?page=history&iddonban=<?= urlencode($d['iddonban']) ?>" class="btn-view">Xem chi tiết</a>

@@ -24,7 +24,7 @@ if (empty($donban)) {
 $don = $donban[0];
 
 $chitiet = $db->xuatdulieu("
-    SELECT sp.tensp, sp.hinhanh, ctdb.soluong, ctdb.dongia, ctdb.thanhtien
+    SELECT sp.tensp, sp.hinhanh, ctdb.soluong, da, duong, size, ctdb.dongia, ctdb.thanhtien
     FROM chitietdonban ctdb
     JOIN sanpham sp ON ctdb.idsp = sp.idsp
     WHERE ctdb.iddonban = '$iddonban'
@@ -39,7 +39,7 @@ $chitiet = $db->xuatdulieu("
         <p><strong>Tên người nhận:</strong> <?= htmlspecialchars($don['tennguoinhan']) ?></p>
         <p><strong>Số điện thoại:</strong> <?= htmlspecialchars($don['sdtnguoinhan']) ?></p>
         <p><strong>Địa chỉ nhận:</strong> <?= htmlspecialchars($don['diachinhan']) ?></p>
-        <p><strong>Ngày bán:</strong> <?= htmlspecialchars($don['ngayban']) ?></p>
+        <p><strong>Ngày bán:</strong> <?= date('d/m/Y', strtotime($don['ngayban'])) ?></p>
     </div>
 
     <div class="box">
@@ -50,6 +50,9 @@ $chitiet = $db->xuatdulieu("
                     <th>Hình ảnh</th>
                     <th>Tên sản phẩm</th>
                     <th style="text-align:center;">Số lượng</th>
+                    <th style="text-align:center;">Đường</th>
+                    <th style="text-align:center;">Đá</th>
+                    <th style="text-align:center;">Size</th>
                     <th style="text-align:right;">Đơn giá</th>
                     <th style="text-align:right;">Thành tiền</th>
                 </tr>
@@ -60,6 +63,9 @@ $chitiet = $db->xuatdulieu("
                         <td><img src="assets/images/<?= htmlspecialchars($row['hinhanh']) ?>" alt=""></td>
                         <td><?= htmlspecialchars($row['tensp']) ?></td>
                         <td style="text-align:center;"><?= $row['soluong'] ?></td>
+                        <td style="text-align:center;"><?= $row['duong'] ?></td>
+                        <td style="text-align:center;"><?= $row['da'] ?></td>
+                        <td style="text-align:center;"><?= $row['size'] ?></td>
                         <td style="text-align:right;"><?= number_format($row['dongia'], 0, ',', '.') ?>₫</td>
                         <td style="text-align:right;"><?= number_format($row['thanhtien'], 0, ',', '.') ?>₫</td>
                     </tr>
@@ -73,8 +79,10 @@ $chitiet = $db->xuatdulieu("
     </div>
 
     <div style="text-align:center; margin-top: 20px; margin-bottom: 20px;">
-        <a href="index.php?page=re-order&iddonban=<?= urlencode($iddonban) ?>" class="reorder-btn">🔁 Đặt lại đơn hàng</a>
+        <a href="index.php?page=re-order&iddonban=<?= urlencode($iddonban) ?>" class="reorder-btn">Đặt lại đơn hàng</a>
+        <a href="index.php?page=customer" class="reorder-btn">Quay về</a>
     </div>
+    
 </div>
 <style>
 h2 {
