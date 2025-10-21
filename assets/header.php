@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="./src/output.css" />
+    <link rel="stylesheet" href="assets/css/header.css">
   </head>
   <body class="bg-amber-100 text-gray-800">
     <div class="min-h-screen flex flex-col">
@@ -26,15 +27,37 @@
                     $sql = "SELECT tenkh FROM khachhang WHERE idkh = $idkh";
                     $result = $db->xuatdulieu($sql);
                     $tenkh = ($result && count($result) > 0) ? $result[0]['tenkh'] : 'Khách hàng';
-
-                    echo '<div><b>Chào, </b><a href="index.php?page=customer" class="font-semibold hover:underline">'
-                        . htmlspecialchars($tenkh) . '</a></div>';
-                    echo '<a href="index.php?page=dangxuat" class="font-semibold pr-3">Đăng xuất</a>';
+                ?>
+                    <div class="user-dropdown">
+                        <button class="user-btn">
+                            <img src="./assets/images/icon.png" alt="user" class="user-icon">
+                            <span class="user-name"><?= htmlspecialchars($tenkh) ?></span>
+                            <span class="arrow">&#9662;</span>
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="index.php?page=customer">Thông tin cá nhân</a>
+                            <a href="index.php?page=password">Đổi mật khẩu</a>
+                            <a href="index.php?page=dangxuat" class="logout">Đăng xuất</a>
+                        </div>
+                    </div>
+                <?php
                 } else {
-                    echo '<a href="index.php?page=login" class="font-semibold pr-3">Đăng nhập</a>';
-                    echo '<a href="index.php?page=register" class="font-semibold pr-3">Đăng ký</a>';
+                ?>
+                    <div class="user-dropdown">
+                        <button class="user-btn">
+                            <img src="./assets/images/icon_setting.png" alt="user" class="user-icon">
+                            <span class="user-name"><?= htmlspecialchars($tenkh) ?></span>
+                            <span class="arrow">&#9662;</span>
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="index.php?page=login">Đăng nhập</a>
+                            <a href="index.php?page=register">Đăng ký</a>
+                        </div>
+                    </div>
+                <?php
                 }
                 ?>
+
             </nav>
           </div>
         </div>
