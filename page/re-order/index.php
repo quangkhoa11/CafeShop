@@ -1,7 +1,6 @@
 <title>Chi tiết đơn hàng</title>
 <?php
 $obj = new database();
-
 if (isset($_GET['iddonban'])) {
     $iddonban = $_GET['iddonban'];
 
@@ -31,7 +30,8 @@ if (isset($_GET['iddonban'])) {
                     'da' => $item['da'],
                     'duong' => $item['duong'],
                     'size' => $item['size'],
-                    'ghichu' => $item['ghichu'] ?? ''
+                    'ghichu' => $item['ghichu'] ?? '',
+                    'hinhanh' => $item['hinhanh'] ?? ''
                 ];
             }, $chitietcu),
             'tongtien' => array_sum(array_map(fn($i) => $i['dongia'] * $i['soluong'], $chitietcu))
@@ -87,7 +87,22 @@ if (isset($_POST['save_order']) && isset($_SESSION['order'])) {
     exit;
 }
 
-if (isset($_SESSION['order'])) {
+if (isset($_POST['save_cart_before_menu']) && isset($_SESSION['order']['cart'])) {
+    foreach ($_SESSION['order']['cart'] as $item) {
+        if (!isset($_SESSION['cart'])) $_SESSION['cart'] = [];
+        if (isset($_SESSION['cart'][$item['idsp']])) {
+            $_SESSION['cart'][$item['idsp']]['soluong'] += $item['soluong'];
+        } else {
+            $_SESSION['cart'][$item['idsp']] = $item;
+        }
+    }
+    header('Location: index.php?page=menu');
+    exit;
+}
+
+?>
+
+<?php if (isset($_SESSION['order'])): 
     $order = $_SESSION['order'];
 ?>
 <div class="order-container">
@@ -137,12 +152,17 @@ if (isset($_SESSION['order'])) {
     </div>
 
     <form method="POST">
+        <input type="hidden" name="save_cart_before_menu" value="1">
+        <button type="submit" class="btn-save-order">➕ Thêm món</button>
+    </form>
+
+    <form method="POST">
         <button type="submit" name="save_order" class="btn-save-order">Xác nhận đặt hàng</button>
     </form>
 </div>
-<?php } else { ?>
+<?php else: ?>
 <p style="text-align:center; margin-top:40px;">Không có thông tin đơn hàng để hiển thị.</p>
-<?php } ?>
+<?php endif; ?>
 
 <style>
 .order-container {
@@ -188,7 +208,7 @@ tfoot td {
 }
 .btn-save-order {
     display: block;
-    margin: 30px auto 0;
+    margin: 20px auto 0;
     background-color: #28a745;
     color: white;
     font-weight: bold;
