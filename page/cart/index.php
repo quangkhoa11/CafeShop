@@ -29,21 +29,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
     $size = $_POST['size'] ?? '';
     $topping = $_POST['topping'] ?? '';
 
+    $newItem = [
+        'idsp' => $idsp,
+        'tensp' => $tensp,
+        'gia' => $gia,
+        'hinhanh' => $hinhanh,
+        'soluong' => $soluong,
+        'idloai' => $idloai,
+        'da' => $da,
+        'duong' => $duong,
+        'size' => $size,
+        'topping' => $topping,
+        'ghichu' => $ghichu
+    ];
+
     if (isset($_SESSION['cart'][$idsp])) {
         $_SESSION['cart'][$idsp]['soluong'] += $soluong;
     } else {
-        $_SESSION['cart'][$idsp] = [
-            'tensp' => $tensp,
-            'gia' => $gia,
-            'hinhanh' => $hinhanh,
-            'soluong' => $soluong,
-            'idloai' => $idloai,
-            'da' => $da,
-            'duong' => $duong,
-            'size' => $size,
-            'topping' => $topping,
-            'ghichu' => $ghichu
-        ];
+        $_SESSION['cart'][$idsp] = $newItem;
+    }
+
+    if (!isset($_SESSION['order'])) $_SESSION['order'] = [];
+    if (!isset($_SESSION['order']['cart'])) $_SESSION['order']['cart'] = [];
+    if (isset($_SESSION['order']['cart'][$idsp])) {
+        $_SESSION['order']['cart'][$idsp]['soluong'] += $soluong;
+    } else {
+        $_SESSION['order']['cart'][$idsp] = $newItem;
     }
 }
 ?>
@@ -89,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
               echo !empty($ghichuArr) ? implode("<br>", $ghichuArr) : "<span class='text-gray-400 italic'>Không có</span>";
             ?>
           </td>
-          <td class="p-3 border text-center text-orange-600 font-bold"><?php echo number_format($item['gia']); ?>₫</td>
+          <td class="p-3 border text-center font-bold"><b class="text-orange-600"><?php echo number_format($item['gia']); ?>₫</b></td>
           <td class="p-3 border text-center">
             <input type="number" min="1" value="<?php echo $item['soluong']; ?>" 
                    class="w-16 text-center border border-gray-300 rounded-lg py-1 text-sm focus:ring-2 focus:ring-orange-300 focus:border-orange-400 quantity-input"
@@ -106,6 +117,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
 
     <div class="text-right text-lg font-semibold p-3 text-gray-800">
       <b>Tổng cộng:</b> <span id="total" class="text-orange-600"><b><?php echo number_format($total); ?> ₫</b></span>
+    </div>
+
+    <div style="text-align:center; margin-bottom:15px;">
+        <a href="index.php?page=menu" class="btn-add-item">➕ Thêm món</a>
     </div>
 
     <div class="text-right mr-3">
@@ -167,13 +182,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
   <?php endif; ?>
 </main>
 
-
 <script>
-  document.getElementById('checkoutBtn')?.addEventListener('click', () => {
+document.getElementById('checkoutBtn')?.addEventListener('click', () => {
     const form = document.getElementById('checkoutForm');
     form.classList.toggle('hidden');
     form.scrollIntoView({ behavior: 'smooth' });
 });
+
 document.querySelectorAll('.quantity-input').forEach(input => {
   input.addEventListener('input', () => {
     let value = input.value.replace(/\D/g, '');
@@ -194,7 +209,7 @@ function updateTotal() {
   document.querySelectorAll('.subtotal').forEach(cell => {
     total += parseFloat(cell.textContent.replace(/[^\d]/g, '')) || 0;
   });
-  document.getElementById('total').textContent = total.toLocaleString('vi-VN');
+  document.getElementById('total').textContent = total.toLocaleString('vi-VN') + ' ₫';
 }
 
 function removeItem(idsp) {
@@ -221,7 +236,7 @@ function removeItem(idsp) {
 </script>
 
 <style>
-  .checkout-form {
+.checkout-form {
     background-color: #fff;
     padding: 25px;
     margin-top: 20px;
@@ -286,11 +301,28 @@ function removeItem(idsp) {
 .checkout-form button:hover {
     background-color: #218838;
 }
+
 @keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .animate-fade { animation: fade 0.3s ease-in-out; }
+
 .table-wrapper {
   overflow-x: auto;
   max-width: 100%;
 }
-</style>
 
+.btn-add-item {
+    display: inline-block;
+    background-color: #ff6600;
+    color: #fff;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.btn-add-item:hover {
+    background-color: #e65c00;
+    transform: translateY(-2px);
+}
+</style>
