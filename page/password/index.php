@@ -14,40 +14,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $xacnhan = trim($_POST['xacnhan']);
 
     if ($matkhaucu === '' || $matkhaumoi === '' || $xacnhan === '') {
-        $thongbao = "⚠️ Vui lòng nhập đầy đủ thông tin.";
+        $thongbao = "Vui lòng nhập đầy đủ thông tin.";
     } else {
         $query = "SELECT matkhau FROM khachhang WHERE idkh = $idkh";
         $data = $obj->xuatdulieu($query);
 
-        if ($data) {
-            $hash_db = $data[0]['matkhau'];
-
-            if (password_verify($matkhaucu, $hash_db)) {
-                if (strlen($matkhaumoi) < 8 || 
-                    !preg_match('/[A-Z]/', $matkhaumoi) || 
-                    !preg_match('/[a-z]/', $matkhaumoi) || 
-                    !preg_match('/[0-9]/', $matkhaumoi)) {
-                    $thongbao = "🔒 Mật khẩu mới phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường và số.";
-                } elseif ($matkhaumoi !== $xacnhan) {
-                    $thongbao = "❌ Mật khẩu xác nhận không khớp.";
-                } else {
-                    $hash_moi = password_hash($matkhaumoi, PASSWORD_BCRYPT);
-                    $obj->themxoasua("UPDATE khachhang SET matkhau = '$hash_moi' WHERE idkh = $idkh");
-                    $thongbao = "✅ Đổi mật khẩu thành công!";
-                }
+        if ($data && password_verify($matkhaucu, $data[0]['matkhau'])) {
+            if ($matkhaumoi === $xacnhan) {
+                $matkhaumoi_hash = password_hash($matkhaumoi, PASSWORD_DEFAULT);
+                $obj->xuatdulieu("UPDATE khachhang SET matkhau = '$matkhaumoi_hash' WHERE idkh = $idkh");
+                $thongbao = "Đổi mật khẩu thành công!";
             } else {
-                $thongbao = "❌ Mật khẩu cũ không đúng.";
+                $thongbao = "Mật khẩu xác nhận không khớp.";
             }
         } else {
-            $thongbao = "Không tìm thấy thông tin tài khoản.";
+            $thongbao = "Mật khẩu cũ không đúng.";
         }
     }
 }
 ?>
 
-<div class="container">
-    <form method="POST" class="form-box">
-        <h2>ĐỔI MẬT KHẨU</h2>
+<div class="change-password-container">
+    <form method="POST" class="change-password-form">
+        <h2>Đổi mật khẩu</h2>
 
         <label>Mật khẩu cũ:</label>
         <input type="password" name="matkhaucu" placeholder="Nhập mật khẩu cũ" required>
@@ -59,86 +48,82 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="password" name="xacnhan" placeholder="Nhập lại mật khẩu mới" required>
 
         <button type="submit">Đổi mật khẩu</button>
-        <?php if ($thongbao != "") echo "<p class='msg'>$thongbao</p>"; ?>
+
+        <?php if ($thongbao != ""): ?>
+            <p class="msg"><?= htmlspecialchars($thongbao) ?></p>
+        <?php endif; ?>
     </form>
 </div>
 
 <style>
-.form-box {
-    width: 360px;
-    margin: 50px auto;
-    padding: 35px 30px;
-    background: linear-gradient(145deg, #ffffff, #f8f8f8);
-    border-radius: 16px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-    font-family: 'Segoe UI', Roboto, sans-serif;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+.change-password-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 15px;
 }
 
-.form-box:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+.change-password-form {
+    width: 100%;
+    max-width: 360px;
+    padding: 30px 25px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', sans-serif;
 }
 
-.form-box h2 {
+.change-password-form h2 {
     text-align: center;
     color: #e67e22;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     font-size: 22px;
-    letter-spacing: 0.5px;
 }
 
-.form-box label {
-    font-weight: 600;
+.change-password-form label {
     display: block;
+    font-weight: 600;
     margin: 12px 0 6px;
-    color: #333;
 }
 
-.form-box input {
+.change-password-form input {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
     font-size: 15px;
-    background-color: #fafafa;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    margin-bottom: 10px;
+    transition: border-color 0.3s;
 }
 
-.form-box input:focus {
+.change-password-form input:focus {
     border-color: #e67e22;
-    box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.15);
     outline: none;
     background-color: #fff;
 }
 
-.form-box button {
+.change-password-form button {
     width: 100%;
-    background: linear-gradient(135deg, #e67e22, #f39c12);
-    color: #fff;
+    background-color: #e67e22;
+    color: white;
     border: none;
     padding: 12px;
     font-size: 16px;
-    font-weight: 600;
-    border-radius: 8px;
+    font-weight: bold;
+    border-radius: 6px;
     cursor: pointer;
+    transition: background 0.3s;
     margin-top: 10px;
-    transition: background 0.3s, transform 0.2s;
 }
 
-.form-box button:hover {
-    background: linear-gradient(135deg, #cf6d17, #e67e22);
-    transform: scale(1.02);
+.change-password-form button:hover {
+    background-color: #cf6d17;
 }
 
 .msg {
-    margin-top: 18px;
     text-align: center;
-    font-weight: 600;
     color: #d35400;
-    background: rgba(230, 126, 34, 0.1);
-    border-radius: 8px;
-    padding: 10px;
-    font-size: 14px;
+    font-weight: bold;
+    margin-top: 15px;
 }
 </style>
