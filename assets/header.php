@@ -36,6 +36,7 @@
                         </button>
                         <div class="dropdown-content">
                             <a href="index.php?page=customer">Thông tin cá nhân</a>
+                            <a href="index.php?page=order-history">Lịch sử đặt hàng</a>
                             <a href="index.php?page=password">Đổi mật khẩu</a>
                             <a href="index.php?page=dangxuat" class="logout">Đăng xuất</a>
                         </div>
