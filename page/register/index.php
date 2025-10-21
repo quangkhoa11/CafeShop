@@ -13,7 +13,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     $matkhau2 = $_POST['matkhau2'];
 
     if (!$tenkh) $errors['tenkh'] = "Vui lòng nhập họ và tên.";
-    if (!$sdt) $errors['sdt'] = "Vui lòng nhập số điện thoại.";
+    if (!$sdt)
+        { $errors['sdt'] = "Vui lòng nhập số điện thoại.";
+    } elseif (!preg_match('/^(0[3|5|7|8|9])[0-9]{8}$/', $sdt)) 
+        { $errors['sdt'] = "Số điện thoại không hợp lệ. Vui lòng nhập lại!";
+    }
     if (!$diachi) $errors['diachi'] = "Vui lòng nhập địa chỉ.";
     if (!$email) $errors['email'] = "Vui lòng nhập email.";
     if (!$matkhau) $errors['matkhau'] = "Vui lòng nhập mật khẩu.";
@@ -84,27 +88,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     <form action="" method="post">
       <label>Họ và tên:</label>
       <input type="text" name="tenkh" value="<?= htmlspecialchars($tenkh ?? '') ?>" required>
-      <small class="error-msg"><?= $errors['tenkh'] ?? '' ?></small>
+      <small class="error-msg"><?= $errors['tenkh'] ?? '*' ?></small>
 
       <label>Số điện thoại:</label>
-      <input type="tel" name="sdt" value="<?= htmlspecialchars($sdt ?? '') ?>" required pattern="[0-9]{10}">
-      <small class="error-msg"><?= $errors['sdt'] ?? '' ?></small>
+      <input type="text" name="sdt"
+       value="<?= htmlspecialchars($sdt ?? '') ?>"
+       maxlength="10"
+       required
+       onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+       oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+      <small class="error-msg">* <?= $errors['sdt'] ?? '' ?></small>
 
       <label>Địa chỉ:</label>
       <input type="text" name="diachi" value="<?= htmlspecialchars($diachi ?? '') ?>" required>
-      <small class="error-msg"><?= $errors['diachi'] ?? '' ?></small>
+      <small class="error-msg">* <?= $errors['diachi'] ?? '' ?></small>
 
       <label>Email:</label>
       <input type="email" name="email" value="<?= htmlspecialchars($email ?? '') ?>" required>
-      <small class="error-msg"><?= $errors['email'] ?? '' ?></small>
+      <small class="error-msg">* <?= $errors['email'] ?? '' ?></small>
 
       <label>Mật khẩu:</label>
       <input type="password" name="matkhau" required>
-      <small class="error-msg"><?= $errors['matkhau'] ?? '' ?></small>
+      <small class="error-msg">* <?= $errors['matkhau'] ?? '' ?></small>
 
       <label>Xác nhận mật khẩu:</label>
       <input type="password" name="matkhau2" required>
-      <small class="error-msg"><?= $errors['matkhau2'] ?? '' ?></small>
+      <small class="error-msg">* <?= $errors['matkhau2'] ?? '' ?></small>
 
       <button type="submit" name="register">Đăng ký</button>
     </form>
