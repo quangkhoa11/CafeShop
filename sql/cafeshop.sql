@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th10 20, 2025 lúc 10:53 AM
+-- Thời gian đã tạo: Th10 22, 2025 lúc 06:49 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -37,7 +37,7 @@ CREATE TABLE `chitietdonban` (
   `soluong` int(11) NOT NULL,
   `dongia` int(11) NOT NULL,
   `thanhtien` int(11) NOT NULL,
-  `ghichu` varchar(100) NOT NULL
+  `ghichu` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -68,7 +68,7 @@ CREATE TABLE `khachhang` (
   `sdt` varchar(18) NOT NULL,
   `diachi` varchar(40) NOT NULL,
   `email` varchar(40) NOT NULL,
-  `matkhau` varchar(40) NOT NULL
+  `matkhau` varchar(400) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
