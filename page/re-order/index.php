@@ -160,7 +160,7 @@ if (isset($_POST['save_cart_before_menu']) && isset($_SESSION['order']['cart']))
         <button type="submit" name="save_order" class="btn-save-order">Xác nhận đặt hàng</button>
     </form>
 </div>
-<?php else: ?>
+<?php else:?>
 <p style="text-align:center; margin-top:40px;">Không có thông tin đơn hàng để hiển thị.</p>
 <?php endif; ?>
 
@@ -219,4 +219,5 @@ tfoot td {
     cursor: pointer;
 }
 .btn-save-order:hover { background-color: #218838; }
+
 </style>
