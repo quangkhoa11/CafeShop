@@ -1,3 +1,4 @@
+<title>Đổi mật khẩu</title>
 <?php
 $obj = new database();
 $thongbao = "";
