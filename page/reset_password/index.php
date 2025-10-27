@@ -77,5 +77,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password'])) {
     <?php endif; ?>
   </div>
 </div>
-
 <link rel="stylesheet" href="assets/css/register.css?v=2">
