@@ -108,9 +108,9 @@ if ($sanpham) {
 
                 <div class="option-group">
                     <p>Lượng đường:</p>
-                    <label><input type="radio" name="duong" value="Không đường" checked> Không đường</label>
-                    <label><input type="radio" name="duong" value="Ít đường" checked> Ít</label>
-                    <label><input type="radio" name="duong" value="Vừa đường"> Vừa</label>
+                    <label><input type="radio" name="duong" value="Không đường" > Không đường</label>
+                    <label><input type="radio" name="duong" value="Ít đường"> Ít</label>
+                    <label><input type="radio" name="duong" value="Vừa đường" checked> Vừa</label>
                     <label><input type="radio" name="duong" value="Nhiều đường"> Nhiều</label>
                 </div>
 
