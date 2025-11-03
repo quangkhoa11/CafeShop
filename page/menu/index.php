@@ -14,16 +14,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart']) && isset(
     $duong = $_POST['duong'] ?? '';
     $size = $_POST['size'] ?? '';
     $ghichu = trim($_POST['ghichu']);
+    $idshop = $_POST['idshop'] ?? 1; 
 
     if (!isset($_SESSION['cart'])) $_SESSION['cart'] = [];
 
-    $cart_key = md5($idsp . $da . $duong . $size .$ghichu);
+    $cart_key = md5($idsp . $da . $duong . $size . $ghichu . $idshop);
 
     if (isset($_SESSION['cart'][$cart_key])) {
         $_SESSION['cart'][$cart_key]['soluong'] += $soluong;
     } else {
         $_SESSION['cart'][$cart_key] = [
             'idsp' => $idsp,
+            'idshop' => $idshop, 
             'tensp' => $tensp,
             'gia' => $gia,
             'hinhanh' => $hinhanh,
@@ -65,14 +67,36 @@ if (!empty($where)) $sql .= " WHERE ".implode(" AND ", $where);
 $sanpham = $obj->xuatdulieu($sql);
 
 if ($sanpham) {
+    $shopIds = array_unique(array_column($sanpham, 'idshop'));
+    $shopList = [];
+    if(!empty($shopIds)){
+        $in = implode(',', $shopIds);
+        $shops = $obj->xuatdulieu("SELECT idshop, tenshop, logo FROM shop WHERE idshop IN ($in)");
+        foreach($shops as $s){
+            $shopList[$s['idshop']] = $s;
+        }
+    }
+
     echo '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-6">';
     foreach ($sanpham as $sp) {
+        $shopHTML = '';
+        $shop = $shopList[$sp['idshop']] ?? null;
+
+        if($shop){
+            $logoPath = !empty($shop['logo']) ? $shop['logo'] : 'assets/images/images.png';
+            $shopHTML = '<div class="flex items-center justify-center mt-2 gap-2 text-gray-500 text-sm">
+                            <img src="'.$logoPath.'" alt="'.htmlspecialchars($shop['tenshop']).'" class="w-6 h-6 object-cover rounded-full shadow-sm">
+                            <span>'.htmlspecialchars($shop['tenshop']).'</span>
+                         </div>';
+        }
+
         echo '<div class="bg-white rounded-xl shadow-md hover:shadow-lg p-5 cursor-pointer"
-              onclick="openModal(\''.$sp["idsp"].'\', \''.addslashes($sp["tensp"]).'\', \''.$sp["gia"].'\', \''.$sp["hinhanh"].'\', \''.$sp["idloai"].'\')">
+              onclick="openModal(\''.$sp["idsp"].'\', \''.addslashes($sp["tensp"]).'\', \''.$sp["gia"].'\', \''.$sp["hinhanh"].'\', \''.$sp["idloai"].'\', \''.$sp["idshop"].'\')">
               <div class="h-56 flex items-center justify-center">
-                <img class="h-full w-full object-cover rounded-lg" src="assets/images/'.$sp["hinhanh"].'" alt="'.$sp["tensp"].'">
+                <img class="h-full w-full object-cover rounded-lg" src="assets/images/'.$sp["hinhanh"].'" alt="'.htmlspecialchars($sp["tensp"]).'">
               </div>
-              <h3 class="mt-4 font-semibold text-lg text-gray-800 text-center">'.$sp["tensp"].'</h3>
+              <h3 class="mt-4 font-semibold text-lg text-gray-800 text-center">'.htmlspecialchars($sp["tensp"]).'</h3>
+              '.$shopHTML.'
               <p class="text-base text-orange-600 mt-2 font-bold text-center">'.number_format($sp["gia"]).' VNĐ</p>
               </div>';
     }
@@ -93,6 +117,7 @@ if ($sanpham) {
 
         <form class="modal-form" onsubmit="return addToCartModal(event)">
             <input type="hidden" id="modalId">
+            <input type="hidden" id="modalShop">
             <input type="hidden" id="modalNameInput">
             <input type="hidden" id="modalPriceInput">
             <input type="hidden" id="modalImgInput">
@@ -119,7 +144,6 @@ if ($sanpham) {
                     <label><input type="radio" name="size" value="M" checked> Size M</label>
                     <label><input type="radio" name="size" value="L"> Size L</label>
                 </div>
-
             </div>
 
             <div class="option-group">
@@ -129,10 +153,7 @@ if ($sanpham) {
 
             <div class="option-group">
                 <p>Số lượng:</p>
-                <input id="modalQty" type="number" name="soluong" 
-                value="1" min="1" step="1"
-                class="w-full text-center border rounded-lg p-2 
-              focus:outline-none focus:ring-2 focus:ring-orange-400 mb-2">
+                <input id="modalQty" type="number" name="soluong" value="1" min="1" step="1" class="w-full text-center border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-orange-400 mb-2">
             </div>
 
             <button type="submit" class="bg-orange-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-orange-600">Thêm vào giỏ hàng</button>
@@ -147,9 +168,9 @@ if ($sanpham) {
 <link rel="stylesheet" href="assets/css/modal.css?v=2">
 
 <script>
-let basePrice = 0; 
+let basePrice = 0;
 
-function openModal(idsp, name, price, img, idloai){
+function openModal(idsp, name, price, img, idloai, idshop){
     const modal = document.getElementById('productModal');
     modal.style.display = 'flex';
     
@@ -160,6 +181,7 @@ function openModal(idsp, name, price, img, idloai){
     document.getElementById('modalPrice').innerText = new Intl.NumberFormat('vi-VN').format(price) + ' VNĐ';
 
     document.getElementById('modalId').value = idsp;
+    document.getElementById('modalShop').value = idshop; 
     document.getElementById('modalNameInput').value = name;
     document.getElementById('modalPriceInput').value = price;
     document.getElementById('modalImgInput').value = img;
@@ -195,9 +217,7 @@ function updateModalPrice(){
     const qty = Number(document.getElementById('modalQty').value) || 1;
 
     let currentPrice = basePrice;
-    if (size === 'L') {
-        currentPrice += 5000;
-    }
+    if (size === 'L') currentPrice += 5000;
 
     const total = currentPrice * qty;
 
@@ -209,6 +229,7 @@ function addToCartModal(event){
     event.preventDefault();
 
     const idsp = document.getElementById('modalId').value;
+    const idshop = document.getElementById('modalShop').value; 
     const tensp = document.getElementById('modalNameInput').value;
     const gia = Number(document.getElementById('modalPriceInput').value); 
     const hinhanh = document.getElementById('modalImgInput').value;
@@ -228,12 +249,11 @@ function addToCartModal(event){
         return false; 
     }
 
-    const thanhtien = gia * soluong;
-
     const formData = new URLSearchParams({
         add_cart: 1,
         ajax: 1,
         idsp: idsp,
+        idshop: idshop,
         tensp: tensp,
         gia: gia,
         hinhanh: hinhanh,
@@ -241,8 +261,7 @@ function addToCartModal(event){
         da: da,
         duong: duong,
         size: size,
-        ghichu: ghichu,
-        thanhtien: thanhtien
+        ghichu: ghichu
     });
 
     fetch(window.location.href, {
@@ -267,9 +286,7 @@ function addToCartModal(event){
 
 document.getElementById('modalQty').addEventListener('input', function (e) {
     this.value = this.value.replace(/[^0-9]/g, '');
-    if (this.value === '' || parseInt(this.value) < 1) {
-        this.value = 1;
-    }
+    if (this.value === '' || parseInt(this.value) < 1) this.value = 1;
     updateModalPrice();
 });
 
