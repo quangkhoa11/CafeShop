@@ -8,23 +8,20 @@ if (!isset($_SESSION['idshop'])) {
 $idshop = $_SESSION['idshop'];
 $db = new database();
 
-// Lấy thông tin shop hiện tại
 $shop = $db->xuatdulieu("SELECT * FROM shop WHERE idshop = '$idshop'")[0];
 
-// Cập nhật thông tin nếu form gửi
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     $tenshop = trim($_POST['tenshop']);
     $email = trim($_POST['email']);
     $sdt = trim($_POST['sdt']);
     $diachi = trim($_POST['diachi']);
 
-    // Xử lý upload logo
     $logo = $shop['logo'];
     if (!empty($_FILES['logo']['name'])) {
         $target_dir = "assets/images/";
         $target_file = $target_dir . basename($_FILES["logo"]["name"]);
         move_uploaded_file($_FILES["logo"]["tmp_name"], $target_file);
-        $logo = $target_file; // ✅ Lưu toàn bộ đường dẫn (VD: assets/images/logocafe.png)
+        $logo = $target_file;
     }
 
     $sql = "UPDATE shop SET 
