@@ -10,7 +10,7 @@ $idkh = $_SESSION['idkh'];
 $db = new database();
 
 $donhang = $db->xuatdulieu("
-    SELECT iddonban, ngayban, tongtien
+    SELECT iddonban, ngayban, tongtien, trangthai
     FROM donban
     WHERE idkh = '$idkh'
     ORDER BY iddonban DESC
@@ -27,15 +27,27 @@ $donhang = $db->xuatdulieu("
                     <th>Mã đơn</th>
                     <th>Ngày đặt</th>
                     <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
                     <th>Chi tiết</th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($donhang as $d): ?>
+                <?php foreach ($donhang as $d): 
+                    $statusClass = '';
+                    switch ($d['trangthai']) {
+                        case 'Đã đặt hàng': $statusClass = 'status-blue'; break;
+                        case 'Đang xử lý': $statusClass = 'status-yellow'; break;
+                        case 'Đã giao cho đơn vị vận chuyển': $statusClass = 'status-purple'; break;
+                        case 'Hoàn thành': $statusClass = 'status-green'; break;
+                        case 'Đã hủy': $statusClass = 'status-red'; break;
+                        default: $statusClass = 'status-gray';
+                    }
+                ?>
                     <tr>
                         <td><?= htmlspecialchars($d['iddonban']) ?></td>
                         <td><?= date('d/m/Y', strtotime($d['ngayban'])) ?></td>
                         <td><?= number_format($d['tongtien'], 0, ',', '.') ?>₫</td>
+                        <td><span class="status <?= $statusClass ?>"><?= htmlspecialchars($d['trangthai']) ?></span></td>
                         <td>
                             <a href="index.php?page=history&iddonban=<?= urlencode($d['iddonban']) ?>" class="btn-view">Xem chi tiết</a>
                         </td>
@@ -152,4 +164,19 @@ $donhang = $db->xuatdulieu("
     background: #777;
     transform: scale(1.05);
 }
+
+.status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.status-blue { background: #e6f2ff; color: #007bff; }
+.status-yellow { background: #fff8e1; color: #e6a600; }
+.status-purple { background: #f3e5f5; color: #8e24aa; }
+.status-green { background: #e8f5e9; color: #2e7d32; }
+.status-red { background: #ffebee; color: #c62828; }
+.status-gray { background: #f5f5f5; color: #555; }
 </style>
