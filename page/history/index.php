@@ -34,6 +34,16 @@ $chitiet = $db->xuatdulieu("
     JOIN sanpham sp ON ctdb.idsp = sp.idsp
     WHERE ctdb.iddonban = '$iddonban'
 ");
+
+$statusClass = '';
+switch ($don['trangthai']) {
+    case 'Đã đặt hàng': $statusClass = 'status-blue'; break;
+    case 'Đang xử lý': $statusClass = 'status-yellow'; break;
+    case 'Đã giao cho đơn vị vận chuyển': $statusClass = 'status-purple'; break;
+    case 'Hoàn thành': $statusClass = 'status-green'; break;
+    case 'Đã hủy': $statusClass = 'status-red'; break;
+    default: $statusClass = 'status-gray';
+}
 ?>
 
 <div class="content-container">
@@ -44,7 +54,8 @@ $chitiet = $db->xuatdulieu("
         <p><strong>Tên người nhận:</strong> <?= htmlspecialchars($don['tennguoinhan']) ?></p>
         <p><strong>Số điện thoại:</strong> <?= htmlspecialchars($don['sdtnguoinhan']) ?></p>
         <p><strong>Địa chỉ nhận:</strong> <?= htmlspecialchars($don['diachinhan']) ?></p>
-        <p><strong>Ngày bán:</strong> <?= date('d/m/Y', strtotime($don['ngayban'])) ?></p>
+        <p><strong>Ngày đặt:</strong> <?= date('d/m/Y', strtotime($don['ngayban'])) ?></p>
+        <p><strong>Trạng thái:</strong> <span class="status <?= $statusClass ?>"><?= htmlspecialchars($don['trangthai']) ?></span></p>
     </div>
 
     <div class="box">
@@ -60,7 +71,7 @@ $chitiet = $db->xuatdulieu("
                     <th style="text-align:center;">Size</th>
                     <th style="text-align:right;">Đơn giá</th>
                     <th style="text-align:right;">Thành tiền</th>
-                    <th style="text-align:right;">Ghi chú</th>
+                    <th style="text-align:center;">Ghi chú</th>
                 </tr>
             </thead>
             <tbody>
@@ -74,7 +85,7 @@ $chitiet = $db->xuatdulieu("
                         <td style="text-align:center;"><?= $row['size'] ?></td>
                         <td style="text-align:right;"><?= number_format($row['dongia'], 0, ',', '.') ?>₫</td>
                         <td style="text-align:right;"><?= number_format($row['thanhtien'], 0, ',', '.') ?>₫</td>
-                        <td style="text-align:center;"><?= $row['ghichu'] ?></td>
+                        <td style="text-align:center;"><?= htmlspecialchars($row['ghichu']) ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -89,23 +100,19 @@ $chitiet = $db->xuatdulieu("
         <a href="index.php?page=re-order&iddonban=<?= urlencode($iddonban) ?>" class="reorder-btn">Đặt lại đơn hàng</a>
         <a href="index.php?page=order-history" class="reorder-btn">Quay về</a>
     </div>
-    
 </div>
+
 <style>
-.content-center {
-    display: flex;
-    justify-content: center;  
-    align-items: flex-start;
-    flex-direction: column;   
-    min-height: 100vh;        
-    padding: 20px;            
-    background: #fff9f0;      
+.content-container {
+    width: 950px;
+    margin: 50px auto;
+    background: #fff9f0;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    font-family: 'Segoe UI', Arial, sans-serif;
 }
 
-.content-center .container {
-    width: 100%;
-    max-width: 900px;        
-}
 h2 {
     color: #e65c00;
     margin-bottom: 30px;
@@ -208,8 +215,20 @@ td img:hover {
     background: #cc5200;
     transform: translateY(-2px);
 }
+.status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 13px;
+}
+.status-blue { background: #e6f2ff; color: #007bff; }
+.status-yellow { background: #fff8e1; color: #e6a600; }
+.status-purple { background: #f3e5f5; color: #8e24aa; }
+.status-green { background: #e8f5e9; color: #2e7d32; }
+.status-red { background: #ffebee; color: #c62828; }
+.status-gray { background: #f5f5f5; color: #555; }
 
-/* Responsive */
 @media (max-width: 768px) {
     table th, table td {
         padding: 8px 6px;
@@ -223,20 +242,6 @@ td img:hover {
 
     .box {
         padding: 15px 20px;
-    }
-}
-
-@media (max-width: 480px) {
-    table {
-        font-size: 12px;
-    }
-
-    .total {
-        font-size: 16px;
-    }
-
-    .total span {
-        font-size: 20px;
     }
 }
 </style>
