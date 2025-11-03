@@ -18,6 +18,7 @@ if (isset($_SESSION['idkh'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
     $idsp = $_POST['idsp'];
+    $idshop = $_POST['idshop'] ?? 1; 
     $tensp = $_POST['tensp'];
     $gia = $_POST['gia'];
     $hinhanh = $_POST['hinhanh'];
@@ -25,12 +26,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
     $soluong = max(1, (int)$_POST['soluong']);
     $da = $_POST['da'] ?? '';
     $duong = $_POST['duong'] ?? '';
-    $ghichu = $_POST['ghichu'] ?? '';
     $size = $_POST['size'] ?? '';
     $topping = $_POST['topping'] ?? '';
+    $ghichu = $_POST['ghichu'] ?? '';
+
+    $cart_key = md5($idsp . $idshop . $da . $duong . $size . $ghichu);
 
     $newItem = [
         'idsp' => $idsp,
+        'idshop' => $idshop,
         'tensp' => $tensp,
         'gia' => $gia,
         'hinhanh' => $hinhanh,
@@ -43,18 +47,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
         'ghichu' => $ghichu
     ];
 
-    if (isset($_SESSION['cart'][$idsp])) {
-        $_SESSION['cart'][$idsp]['soluong'] += $soluong;
+    if (isset($_SESSION['cart'][$cart_key])) {
+        $_SESSION['cart'][$cart_key]['soluong'] += $soluong;
     } else {
-        $_SESSION['cart'][$idsp] = $newItem;
-    }
-
-    if (!isset($_SESSION['order'])) $_SESSION['order'] = [];
-    if (!isset($_SESSION['order']['cart'])) $_SESSION['order']['cart'] = [];
-    if (isset($_SESSION['order']['cart'][$idsp])) {
-        $_SESSION['order']['cart'][$idsp]['soluong'] += $soluong;
-    } else {
-        $_SESSION['order']['cart'][$idsp] = $newItem;
+        $_SESSION['cart'][$cart_key] = $newItem;
     }
 }
 ?>
@@ -80,24 +76,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
       </thead>
       <tbody>
         <?php $total = 0; ?>
-        <?php foreach ($_SESSION['cart'] as $idsp => $item): 
+        <?php foreach ($_SESSION['cart'] as $cart_key => $item): 
           $subtotal = $item['gia'] * $item['soluong'];
           $total += $subtotal;
         ?>
-        <tr class="hover:bg-orange-50 transition duration-200" data-id="<?php echo $idsp; ?>">
+        <tr class="hover:bg-orange-50 transition duration-200" data-key="<?php echo $cart_key; ?>">
           <td class="p-3 border text-center">
             <img src="assets/images/<?php echo htmlspecialchars($item['hinhanh']); ?>" class="w-16 h-16 object-cover rounded-md mx-auto shadow-sm border border-gray-200">
           </td>
           <td class="p-3 border font-semibold text-gray-800 text-center"><?php echo htmlspecialchars($item['tensp']); ?></td>
           <td class="p-3 border text-left leading-snug">
             <?php
-              $ghichuArr = [];
-              if (!empty($item['da'])) $ghichuArr[] = "<b>Đá:</b> " . htmlspecialchars($item['da']);
-              if (!empty($item['duong'])) $ghichuArr[] = "<b>Đường:</b> " . htmlspecialchars($item['duong']);
-              if (!empty($item['size'])) $ghichuArr[] = "<b>Size:</b> " . htmlspecialchars($item['size']);
-              if (!empty($item['topping'])) $ghichuArr[] = "<b>Topping:</b> " . htmlspecialchars($item['topping']);
-              if (!empty($item['ghichu'])) $ghichuArr[] = "<b>Ghi chú:</b> " . htmlspecialchars($item['ghichu']);
-              echo !empty($ghichuArr) ? implode("<br>", $ghichuArr) : "<span class='text-gray-400 italic'>Không có</span>";
+              $options = [];
+              if (!empty($item['da'])) $options[] = "<b>Đá:</b> " . htmlspecialchars($item['da']);
+              if (!empty($item['duong'])) $options[] = "<b>Đường:</b> " . htmlspecialchars($item['duong']);
+              if (!empty($item['size'])) $options[] = "<b>Size:</b> " . htmlspecialchars($item['size']);
+              if (!empty($item['topping'])) $options[] = "<b>Topping:</b> " . htmlspecialchars($item['topping']);
+              if (!empty($item['ghichu'])) $options[] = "<b>Ghi chú:</b> " . htmlspecialchars($item['ghichu']);
+              echo implode("<br>", $options);
             ?>
           </td>
           <td class="p-3 border text-center font-bold"><b class="text-orange-600"><?php echo number_format($item['gia']); ?>₫</b></td>
@@ -108,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
           </td>
           <td class="p-3 border text-center font-semibold text-gray-800 subtotal"><?php echo number_format($subtotal); ?>₫</td>
           <td class="p-3 border text-center">
-            <button type="button" onclick="removeItem('<?php echo $idsp; ?>')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-full text-xs shadow transition duration-200">✖</button>
+            <button type="button" onclick="removeItem('<?php echo $cart_key; ?>')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-full text-xs shadow transition duration-200">✖</button>
           </td>
         </tr>
         <?php endforeach; ?>
@@ -126,48 +122,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
     <div class="text-right mr-3">
 <?php if (isset($_SESSION['idkh'])): ?>
     <div class="text-right mt-4">
-        <button style="border-radius: 3px;" id="checkoutBtn" class="bg-orange-500 text-white font-bold py-2 px-4 rounded">
+    <form method="post" action="index.php?page=order-details" style="display:inline;">
+        <button type="submit" name="confirm_order" class="bg-orange-500 text-white font-bold py-2 px-4 rounded" style="border-radius: 3px;">
             Thanh toán
         </button>
-    </div>
-
-    <div id="checkoutForm" class="hidden checkout-form">
-        <h2>Thông tin giao hàng</h2>
-
-        <button type="button" id="btnUseAccount" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded mb-3">
-            🧭 Dùng địa chỉ tài khoản
-        </button>
-
-        <form id="formCheckout" method="post" action="index.php?page=order-details">
-            <div class="form-group">
-                <label>Họ và tên:</label>
-                <input type="text" id="tenkh" name="tenkh" required placeholder="Nhập họ và tên">
-            </div>
-            <div class="form-group">
-                <label>Địa chỉ:</label>
-                <input type="text" id="diachi" name="diachi" required placeholder="Nhập địa chỉ giao hàng">
-            </div>
-            <div class="form-group">
-                <label>Số điện thoại:</label>
-                <input type="tel" id="sdt" name="sdt" required pattern="[0-9]{10}" placeholder="Nhập số điện thoại">
-            </div>
-            <button type="submit" name="confirm_order">Xác nhận đơn hàng</button>
-        </form>
-    </div>
-
-    <script>
-      const khachhangData = <?php echo json_encode($khachhang_info); ?>;
-      document.getElementById('btnUseAccount')?.addEventListener('click', () => {
-          if (khachhangData) {
-              document.getElementById('tenkh').value = khachhangData.tenkh || '';
-              document.getElementById('diachi').value = khachhangData.diachi || '';
-              document.getElementById('sdt').value = khachhangData.sdt || '';
-          } else {
-              alert("Không thể lấy thông tin tài khoản.");
-          }
-      });
-    </script>
-
+    </form>
+</div>
 <?php else: ?>
     <p class="text-center text-red-500 font-semibold mt-4">
         Vui lòng <a href="index.php?page=login" class="underline text-orange-500">đăng nhập</a> để thanh toán
@@ -183,12 +143,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
 </main>
 
 <script>
-document.getElementById('checkoutBtn')?.addEventListener('click', () => {
-    const form = document.getElementById('checkoutForm');
-    form.classList.toggle('hidden');
-    form.scrollIntoView({ behavior: 'smooth' });
-});
-
 document.querySelectorAll('.quantity-input').forEach(input => {
   input.addEventListener('input', () => {
     let value = input.value.replace(/\D/g, '');
@@ -212,16 +166,16 @@ function updateTotal() {
   document.getElementById('total').textContent = total.toLocaleString('vi-VN') + ' ₫';
 }
 
-function removeItem(idsp) {
+function removeItem(cart_key) {
   if (!confirm('Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?')) return;
 
-  const row = document.querySelector(`tr[data-id="${idsp}"]`);
+  const row = document.querySelector(`tr[data-key="${cart_key}"]`);
   if (row) {
     row.remove();
     fetch('page/cart/remove_item.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'idsp=' + encodeURIComponent(idsp)
+      body: 'cart_key=' + encodeURIComponent(cart_key)
     });
 
     updateTotal();
@@ -320,7 +274,6 @@ function removeItem(idsp) {
     text-decoration: none;
     transition: background 0.3s, transform 0.2s;
 }
-
 
 .btn-add-item:hover {
     background-color: #e65c00;
