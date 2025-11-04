@@ -134,3 +134,117 @@ input[type="number"]:focus {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+.product-card {
+  position: relative;
+  background: #fff;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 1px solid #f3f3f3;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.product-image {
+  position: relative;
+  width: 100%;
+  height: 230px;
+  overflow: hidden;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .3s ease;
+}
+
+.product-card:hover .product-image img {
+  transform: scale(1.05);
+}
+
+.shop-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.9);
+  padding: 4px 9px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.shop-badge img {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #eee;
+}
+
+.shop-badge span {
+  font-size: 0.82rem;
+  color: #444;
+  font-weight: 500;
+}
+
+.product-info {
+  padding: 12px 15px 16px;
+  text-align: center;
+}
+
+.product-name {
+  font-size: 1.05rem;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.product-price {
+  font-size: 1rem;
+  color: #e67e22;
+  font-weight: 700;
+}
+
+.category-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.category-list li a {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  background: #fff;
+  border: 1px solid #f6b26b;
+  color: #d35400;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all .25s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.category-list li a:hover,
+.category-list li a.active {
+  background: #fff3e0;
+  border-color: #f39c12;
+  color: #b65a0b;
+}
+
+#cartMessage {
+  background: linear-gradient(135deg, #16a085, #27ae60);
+  font-weight: 600;
+}
+

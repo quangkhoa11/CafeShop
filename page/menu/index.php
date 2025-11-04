@@ -79,27 +79,29 @@ if ($sanpham) {
 
     echo '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-6">';
     foreach ($sanpham as $sp) {
-        $shopHTML = '';
-        $shop = $shopList[$sp['idshop']] ?? null;
+    $shop = $shopList[$sp['idshop']] ?? null;
+    $logoPath = $shop && !empty($shop['logo']) ? $shop['logo'] : 'assets/images/images.png';
+    $shopName = $shop ? htmlspecialchars($shop['tenshop']) : 'Cửa hàng';
 
-        if($shop){
-            $logoPath = !empty($shop['logo']) ? $shop['logo'] : 'assets/images/images.png';
-            $shopHTML = '<div class="flex items-center justify-center mt-2 gap-2 text-gray-500 text-sm">
-                            <img src="'.$logoPath.'" alt="'.htmlspecialchars($shop['tenshop']).'" class="w-6 h-6 object-cover rounded-full shadow-sm">
-                            <span>'.htmlspecialchars($shop['tenshop']).'</span>
-                         </div>';
-        }
+    echo '
+    <div class="product-card"
+         onclick="openModal(\''.$sp["idsp"].'\', \''.addslashes($sp["tensp"]).'\', \''.$sp["gia"].'\', \''.$sp["hinhanh"].'\', \''.$sp["idloai"].'\', \''.$sp["idshop"].'\')">
 
-        echo '<div class="bg-white rounded-xl shadow-md hover:shadow-lg p-5 cursor-pointer"
-              onclick="openModal(\''.$sp["idsp"].'\', \''.addslashes($sp["tensp"]).'\', \''.$sp["gia"].'\', \''.$sp["hinhanh"].'\', \''.$sp["idloai"].'\', \''.$sp["idshop"].'\')">
-              <div class="h-56 flex items-center justify-center">
-                <img class="h-full w-full object-cover rounded-lg" src="assets/images/'.$sp["hinhanh"].'" alt="'.htmlspecialchars($sp["tensp"]).'">
-              </div>
-              <h3 class="mt-4 font-semibold text-lg text-gray-800 text-center">'.htmlspecialchars($sp["tensp"]).'</h3>
-              '.$shopHTML.'
-              <p class="text-base text-orange-600 mt-2 font-bold text-center">'.number_format($sp["gia"]).' VNĐ</p>
-              </div>';
-    }
+        <div class="product-image">
+            <img src="assets/images/'.$sp["hinhanh"].'" alt="'.htmlspecialchars($sp["tensp"]).'">
+            <div class="shop-badge">
+                <img src="'.$logoPath.'" alt="'.$shopName.'">
+                <span>'.$shopName.'</span>
+            </div>
+        </div>
+
+        <div class="product-info">
+            <h3 class="product-name">'.htmlspecialchars($sp["tensp"]).'</h3>
+            <p class="product-price">'.number_format($sp["gia"]).' VNĐ</p>
+        </div>
+    </div>';
+}
+
     echo '</div>';
 } else {
     echo '<p class="text-center text-gray-500 mt-10">Hiện tại chưa có sản phẩm nào</p>';
@@ -165,7 +167,7 @@ if ($sanpham) {
     <span id="cartMessageText">Đã thêm vào giỏ hàng!!</span>
 </div>
 
-<link rel="stylesheet" href="assets/css/modal.css?v=2">
+<link rel="stylesheet" href="assets/css/modal.css?v=1">
 
 <script>
 let basePrice = 0;
