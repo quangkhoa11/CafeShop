@@ -7,7 +7,7 @@ if (!isset($_SESSION['dangnhap']) || $_SESSION['role'] !== 'shop') {
 $db = new database();
 $idshop = $_SESSION['idshop'];
 
-$sql = "SELECT sp.idsp, sp.tensp, sp.gia, sp.mota, sp.hinhanh, l.tenloai
+$sql = "SELECT sp.idsp, sp.tensp, sp.gia, sp.mota, sp.hinhanh, sp.trangthai, l.tenloai
         FROM sanpham sp
         LEFT JOIN loaisp l ON sp.idloai = l.idloai
         WHERE sp.idshop = '$idshop'
@@ -17,6 +17,7 @@ $products = $db->xuatdulieu($sql);
 
 <title>Quản lý sản phẩm</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+
 <div class="container mx-auto py-10 px-4">
   <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
     <h1 class="text-3xl font-bold text-orange-600">🛍️ Quản lý sản phẩm</h1>
@@ -36,6 +37,7 @@ $products = $db->xuatdulieu($sql);
             <th class="py-3 px-4 border-b">Loại</th>
             <th class="py-3 px-4 border-b">Giá</th>
             <th class="py-3 px-4 border-b">Mô tả</th>
+            <th class="py-3 px-4 border-b">Trạng thái</th>
             <th class="py-3 px-4 border-b">Hành động</th>
           </tr>
         </thead>
@@ -60,16 +62,32 @@ $products = $db->xuatdulieu($sql);
                 <?= htmlspecialchars(strlen($p['mota']) > 50 ? substr($p['mota'], 0, 50) . '…' : $p['mota']) ?>
               </td>
               <td class="py-3 px-4 border-b">
+                <?php if ($p['trangthai'] == 1): ?>
+                  <span class="text-green-600 font-semibold">Public</span>
+                <?php else: ?>
+                  <span class="text-gray-500 font-semibold">Unpublic</span>
+                <?php endif; ?>
+              </td>
+              <td class="py-3 px-4 border-b">
                 <div class="flex justify-center gap-3">
                   <a href="index.php?page=shop_edit_product&idsp=<?= $p['idsp'] ?>" 
                      class="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 font-semibold transition">
                      ✏️ Sửa
                   </a>
-                  <a href="index.php?page=shop_delete_product&id=<?= $p['idsp'] ?>" 
-                     onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này không?')" 
-                     class="px-3 py-1 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 font-semibold transition">
-                     🗑️ Xóa
-                  </a>
+
+                  <?php if ($p['trangthai'] == 1): ?>
+                    <a href="index.php?page=shop_toggle_product&id=<?= $p['idsp'] ?>&action=hide" 
+                       onclick="return confirm('Ẩn sản phẩm này?')" 
+                       class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 font-semibold transition">
+                       👁️ Ẩn
+                    </a>
+                  <?php else: ?>
+                    <a href="index.php?page=shop_toggle_product&id=<?= $p['idsp'] ?>&action=show" 
+                       onclick="return confirm('Hiển thị lại sản phẩm này?')" 
+                       class="px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 font-semibold transition">
+                       🔁 Hiển thị
+                    </a>
+                  <?php endif; ?>
                 </div>
               </td>
             </tr>
