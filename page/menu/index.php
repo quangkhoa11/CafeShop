@@ -61,7 +61,7 @@ if ($loaisp) {
 $cate = isset($_GET['cate']) ? $_GET['cate'] : '';
 $where = [];
 if ($cate) $where[] = "idloai='$cate'";
-$sql = "SELECT * FROM sanpham";
+$sql = "SELECT * FROM sanpham WHERE trangthai = 1";
 if (!empty($where)) $sql .= " WHERE ".implode(" AND ", $where);
 
 $sanpham = $obj->xuatdulieu($sql);
