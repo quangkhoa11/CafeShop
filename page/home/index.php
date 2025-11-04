@@ -64,38 +64,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
     </div>
 
     <?php
-    $sql = "SELECT * FROM sanpham sp 
-            JOIN loaisp lsp ON sp.idloai = lsp.idloai 
-            WHERE sp.idloai = 3 
-            ORDER BY RAND() 
-            LIMIT 3";
-    $monbanchay = $db->xuatdulieu($sql);
-    ?>
+$sql = "SELECT sp.*, lsp.tenloai, s.tenshop, s.logo 
+        FROM sanpham sp
+        JOIN loaisp lsp ON sp.idloai = lsp.idloai
+        JOIN shop s ON sp.idshop = s.idshop
+        WHERE sp.idloai = 3
+        ORDER BY RAND()
+        LIMIT 3";
+$monbanchay = $db->xuatdulieu($sql);
+?>
 
-    <section class="mt-12 container mx-auto px-4">
-        <h2 class="text-2xl font-semibold mb-6 text-center text-amber-700">☕ Món Bán Chạy</h2>
+<section class="monbanchay">
+    <h2 class="title-section">☕ Món Bán Chạy</h2>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <?php if ($monbanchay && count($monbanchay) > 0): ?>
-                <?php foreach ($monbanchay as $mon): ?>
-                    <div 
-                        class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-transform hover:scale-105 p-4 cursor-pointer"
-                        onclick="openModal('<?php echo $mon['idsp']; ?>','<?php echo addslashes($mon['tensp']); ?>','<?php echo $mon['gia']; ?>','<?php echo $mon['hinhanh']; ?>')"
-                    >
-                        <div class="h-60 flex items-center justify-center">
-                            <img class="h-full w-full object-cover rounded-lg" 
-                                 src="./assets/images/<?php echo $mon['hinhanh']; ?>" 
-                                 alt="<?php echo $mon['tensp']; ?>">
+    <div class="sanpham-grid">
+        <?php if ($monbanchay && count($monbanchay) > 0): ?>
+            <?php foreach ($monbanchay as $mon): ?>
+                <div class="sanpham-item" 
+                    onclick="openModal('<?php echo $mon['idsp']; ?>',
+                                       '<?php echo addslashes($mon['tensp']); ?>',
+                                       '<?php echo $mon['gia']; ?>',
+                                       '<?php echo $mon['hinhanh']; ?>')">
+                    
+                    <div class="sanpham-img-wrap">
+                        <img src="./assets/images/<?php echo $mon['hinhanh']; ?>" 
+                             alt="<?php echo $mon['tensp']; ?>" 
+                             class="sanpham-img">
+
+                        <div class="shop-info">
+                            <img src="<?php echo $mon['logo']; ?>" 
+                                 alt="<?php echo $mon['tenshop']; ?>" 
+                                 class="shop-logo">
+                            <span class="shop-name"><?php echo $mon['tenshop']; ?></span>
                         </div>
-                        <h3 class="mt-3 font-medium text-center text-gray-800"><?php echo $mon['tensp']; ?></h3>
-                        <p class="text-center text-amber-600 font-semibold mt-1"><?php echo number_format($mon['gia']); ?> VNĐ</p>
                     </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p class="col-span-3 text-center text-gray-500">Hiện chưa có sản phẩm nào trong danh sách bán chạy.</p>
-            <?php endif; ?>
-        </div>
-    </section>
+
+                    <h3 class="sanpham-name"><?php echo $mon['tensp']; ?></h3>
+                    <p class="sanpham-price"><?php echo number_format($mon['gia']); ?> VNĐ</p>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p class="no-products">Hiện chưa có sản phẩm nào trong danh sách bán chạy.</p>
+        <?php endif; ?>
+    </div>
+</section>
+
 
     <div id="productModal" class="modal">
         <div class="modal-content">
@@ -231,3 +244,4 @@ document.getElementById('modalForm').addEventListener('submit', async function(e
     }
 });
 </script>
+<link rel="stylesheet" href="assets/css/menu.css">
