@@ -9,7 +9,6 @@ $config = [
     "key2" => "trMrHtvjo6myautxDUiAcYsVtaeQ8nhf"
 ];
 
-// Đọc JSON từ request body (callback từ ZaloPay)
 $json = file_get_contents("php://input");
 $data = json_decode($json, true);
 
@@ -18,18 +17,15 @@ file_put_contents(__DIR__ . "/callback_log.txt", date("Y-m-d H:i:s") . " | " . $
 $result = [];
 
 try {
-    // Kiểm tra chữ ký MAC hợp lệ
     $reqmac = hash_hmac("sha256", $data["data"], $config["key2"]);
 
     if ($reqmac != $data["mac"]) {
         $result["return_code"] = -1;
         $result["return_message"] = "Invalid MAC";
     } else {
-        // Giải mã dữ liệu đơn hàng
         $order = json_decode($data["data"], true);
         $embed = json_decode($order["embed_data"], true);
 
-        // ✅ Lấy iddonban thật trong embeddata (do bạn đã gửi khi tạo đơn)
         $order_id = $embed["iddonban"] ?? null;
 
         if ($order_id) {
@@ -50,7 +46,6 @@ try {
     $result["return_message"] = $e->getMessage();
 }
 
-// Gửi phản hồi JSON cho ZaloPay
 header('Content-Type: application/json');
 echo json_encode($result);
 ?>
