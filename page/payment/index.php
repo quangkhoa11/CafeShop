@@ -71,8 +71,14 @@ if (isset($_POST['pay_zalopay'])) {
         "endpoint" => "https://sb-openapi.zalopay.vn/v2/create"
     ];
 
-    $redirect = "https://hostless-subpedunculate-gracelynn.ngrok-free.dev/cafeshop/index.php?page=return";
-    $callback = "https://hostless-subpedunculate-gracelynn.ngrok-free.dev/cafeshop/index.php?page=callback";
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+    $host = $_SERVER['HTTP_HOST'];
+
+    $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+    if ($basePath === '/' || $basePath === '\\') $basePath = ''; 
+
+    $redirect = "$protocol://$host$basePath/index.php?page=return";
+    $callback = "$protocol://$host$basePath/index.php?page=callback";
 
     $ordersByShop = [];
     foreach ($orderData['cart'] as $item) {
