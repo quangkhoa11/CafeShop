@@ -8,6 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
     $tensp = $_POST['tensp'];
     $gia = (int)$_POST['gia'];
     $hinhanh = $_POST['hinhanh'];
+    $idshop = $_POST['idshop'] ?? 1;
     $soluong = (int)$_POST['soluong'];
     $da = $_POST['da'] ?? '';
     $duong = $_POST['duong'] ?? '';
@@ -22,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
     } else {
         $_SESSION['cart'][$cart_key] = [
             'idsp' => $idsp,
+            'idshop' => $idshop,
             'tensp' => $tensp,
             'gia' => $gia,
             'hinhanh' => $hinhanh,
@@ -82,9 +84,11 @@ $monbanchay = $db->xuatdulieu($sql);
             <?php foreach ($monbanchay as $mon): ?>
                 <div class="sanpham-item" 
                     onclick="openModal('<?php echo $mon['idsp']; ?>',
-                                       '<?php echo addslashes($mon['tensp']); ?>',
-                                       '<?php echo $mon['gia']; ?>',
-                                       '<?php echo $mon['hinhanh']; ?>')">
+                   '<?php echo addslashes($mon['tensp']); ?>',
+                   '<?php echo $mon['gia']; ?>',
+                   '<?php echo $mon['hinhanh']; ?>',
+                   '<?php echo $mon['idshop']; ?>')">
+
                     
                     <div class="sanpham-img-wrap">
                         <img src="./assets/images/<?php echo $mon['hinhanh']; ?>" 
@@ -123,6 +127,8 @@ $monbanchay = $db->xuatdulieu($sql);
                 <input type="hidden" name="tensp" id="modalNameInput">
                 <input type="hidden" name="gia" id="modalPriceInput">
                 <input type="hidden" name="hinhanh" id="modalImgInput">
+                <input type="hidden" name="idshop" id="modalShopId">
+
 
                 <div class="option-group">
                     <p>Lượng đá:</p>
@@ -174,7 +180,7 @@ $monbanchay = $db->xuatdulieu($sql);
 <script>
 let basePrice = 0;
 
-function openModal(idsp, name, price, img){
+function openModal(idsp, name, price, img, idshop){
     const modal = document.getElementById('productModal');
     modal.style.display = 'flex';
 
@@ -187,6 +193,7 @@ function openModal(idsp, name, price, img){
     document.getElementById('modalNameInput').value = name;
     document.getElementById('modalPriceInput').value = price;
     document.getElementById('modalImgInput').value = img;
+    document.getElementById('modalShopId').value = idshop;
     document.getElementById('modalQty').value = 1;
     updatePrice();
 }
