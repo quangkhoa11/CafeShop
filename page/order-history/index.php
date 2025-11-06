@@ -52,7 +52,7 @@ $donhang = $db->xuatdulieu("
                         <td>
                             <a href="index.php?page=history&iddonban=<?= urlencode($d['iddonban']) ?>" class="btn-view">Xem</a>
                             <?php if ($d['trangthai'] === 'Chờ thanh toán'): ?>
-                                <a href="index.php?page=payment&iddonban=<?= urlencode($d['iddonban']) ?>" class="btn-pay">Thanh toán</a>
+                                <a href="index.php?page=payment_back&iddonban=<?= urlencode($d['iddonban']) ?>" class="btn-pay">Thanh toán</a>
                             <?php endif; ?>
                         </td>
                     </tr>
