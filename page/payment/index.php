@@ -4,6 +4,18 @@ ob_start();
 $title = "Thanh toán";
 $obj = new database();
 
+$idkh = $_SESSION['idkh'] ?? 0;
+if (!empty($_SESSION['zalopay_pending'])) {
+    unset($_SESSION['cart']);
+    unset($_SESSION['order']);
+    unset($_SESSION['zalopay_pending']); 
+    echo "<script>
+        alert('Đơn hàng của bạn đang ở trạng thái Chờ thanh toán!');
+        window.location='index.php?page=menu';
+    </script>";
+    exit();
+}
+
 if (empty($_SESSION['order'])) {
     header('Location: index.php?page=order-details');
     exit();
@@ -20,7 +32,6 @@ function generateOrderID($obj) {
     }
     return 'DB001';
 }
-
 if (isset($_POST['pay_cod'])) {
     $orderData = $_SESSION['order'];
     $idkh = $_SESSION['idkh'] ?? 1;
@@ -64,6 +75,8 @@ if (isset($_POST['pay_zalopay'])) {
     $idkh = $_SESSION['idkh'] ?? 1;
     $orderData = $_SESSION['order'];
 
+    $_SESSION['zalopay_pending'] = true;
+
     $config = [
         "app_id" => 2554,
         "key1" => "sdngKKJmqEMzvh5QQcdD2A9XBSKUNaYn",
@@ -73,7 +86,6 @@ if (isset($_POST['pay_zalopay'])) {
 
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
     $host = $_SERVER['HTTP_HOST'];
-
     $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
     if ($basePath === '/' || $basePath === '\\') $basePath = ''; 
 
@@ -141,12 +153,11 @@ if (isset($_POST['pay_zalopay'])) {
         $result = json_decode($response, true);
 
         if (isset($result["return_code"]) && $result["return_code"] == 1) {
-    header("Location: " . $result["order_url"]);
-    exit();
-    } else {
-        $error = "Không thể tạo đơn thanh toán ZaloPay cho shop #$shopId. Vui lòng thử lại.";
-    }
-
+            header("Location: " . $result["order_url"]);
+            exit();
+        } else {
+            $error = "Không thể tạo đơn thanh toán ZaloPay cho shop #$shopId. Vui lòng thử lại.";
+        }
     }
 }
 ?>
