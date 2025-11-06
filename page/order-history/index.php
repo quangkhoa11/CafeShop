@@ -28,13 +28,14 @@ $donhang = $db->xuatdulieu("
                     <th>Ngày đặt</th>
                     <th>Tổng tiền</th>
                     <th>Trạng thái</th>
-                    <th>Chi tiết</th>
+                    <th>Thao tác</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($donhang as $d): 
                     $statusClass = '';
                     switch ($d['trangthai']) {
+                        case 'Chờ thanh toán': $statusClass = 'status-orange'; break;
                         case 'Đã đặt hàng': $statusClass = 'status-blue'; break;
                         case 'Đang xử lý': $statusClass = 'status-yellow'; break;
                         case 'Đã giao cho đơn vị vận chuyển': $statusClass = 'status-purple'; break;
@@ -49,7 +50,10 @@ $donhang = $db->xuatdulieu("
                         <td><?= number_format($d['tongtien'], 0, ',', '.') ?>₫</td>
                         <td><span class="status <?= $statusClass ?>"><?= htmlspecialchars($d['trangthai']) ?></span></td>
                         <td>
-                            <a href="index.php?page=history&iddonban=<?= urlencode($d['iddonban']) ?>" class="btn-view">Xem chi tiết</a>
+                            <a href="index.php?page=history&iddonban=<?= urlencode($d['iddonban']) ?>" class="btn-view">Xem</a>
+                            <?php if ($d['trangthai'] === 'Chờ thanh toán'): ?>
+                                <a href="index.php?page=payment&iddonban=<?= urlencode($d['iddonban']) ?>" class="btn-pay">Thanh toán</a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -73,11 +77,6 @@ $donhang = $db->xuatdulieu("
     border-radius: 16px;
     box-shadow: 0 6px 20px rgba(0,0,0,0.08);
     font-family: 'Segoe UI', Arial, sans-serif;
-    transition: all 0.3s ease;
-}
-
-.history-container:hover {
-    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
 }
 
 .history-container h2 {
@@ -121,10 +120,8 @@ $donhang = $db->xuatdulieu("
     transition: all 0.2s ease;
 }
 
-.btn-view {
+.btn-view, .btn-pay {
     display: inline-block;
-    background: #ff6600;
-    color: white;
     padding: 8px 14px;
     border-radius: 6px;
     text-decoration: none;
@@ -132,8 +129,24 @@ $donhang = $db->xuatdulieu("
     transition: all 0.3s ease;
 }
 
+.btn-view {
+    background: #ff6600;
+    color: white;
+}
+
 .btn-view:hover {
     background: #e05500;
+    transform: scale(1.05);
+}
+
+.btn-pay {
+    background: #0099ff;
+    color: white;
+    margin-left: 5px;
+}
+
+.btn-pay:hover {
+    background: #007acc;
     transform: scale(1.05);
 }
 
@@ -179,4 +192,5 @@ $donhang = $db->xuatdulieu("
 .status-green { background: #e8f5e9; color: #2e7d32; }
 .status-red { background: #ffebee; color: #c62828; }
 .status-gray { background: #f5f5f5; color: #555; }
+.status-orange { background: #fff3e0; color: #ff6600; }
 </style>
