@@ -1,4 +1,4 @@
-<title>Chi tiết đươn hàng</title>
+<title>Chi tiết đơn hàng</title>
 <?php
 $title = "Chi tiết đơn hàng";
 $obj = new database();
