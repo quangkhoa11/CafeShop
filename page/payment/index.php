@@ -5,7 +5,7 @@ $title = "Thanh toán";
 $obj = new database();
 
 if (empty($_SESSION['order'])) {
-    header('Location: ../order-details/index.php');
+    header('Location: index.php?page=order-details');
     exit();
 }
 
@@ -141,12 +141,12 @@ if (isset($_POST['pay_zalopay'])) {
         $result = json_decode($response, true);
 
         if (isset($result["return_code"]) && $result["return_code"] == 1) {
-            unset($_SESSION['order']); 
-            header("Location: " . $result["order_url"]);
-            exit();
-        } else {
-            $error = "Không thể tạo đơn thanh toán ZaloPay cho shop #$shopId. Vui lòng thử lại.";
-        }
+    header("Location: " . $result["order_url"]);
+    exit();
+    } else {
+        $error = "Không thể tạo đơn thanh toán ZaloPay cho shop #$shopId. Vui lòng thử lại.";
+    }
+
     }
 }
 ?>
