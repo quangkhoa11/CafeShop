@@ -27,11 +27,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
 }
 
 $sql = "
-    SELECT db.*, kh.tenkh 
+    SELECT db.*, kh.tenkh
     FROM donban db
     JOIN khachhang kh ON db.idkh = kh.idkh
     WHERE db.idshop = '$idshop'
-    ORDER BY db.ngayban DESC
+    ORDER BY db.trangthai = 'Hoàn thành' ASC
 ";
 $donhangs = $db->xuatdulieu($sql);
 ?>
