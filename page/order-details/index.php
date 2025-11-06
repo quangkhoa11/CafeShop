@@ -33,6 +33,12 @@ if (isset($_POST['confirm_order_orderdetails'])) {
 }
 
 $order = $_SESSION['order'] ?? null;
+if (isset($_SESSION['order'])) {
+    unset($_SESSION['order']);
+    unset($_SESSION['cart']);
+    header("Location: index.php?page=menu");
+    exit();
+}
 ?>
 
 <?php if ($order || !empty($_SESSION['cart'])): ?>
