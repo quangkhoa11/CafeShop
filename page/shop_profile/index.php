@@ -34,16 +34,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
         }
     }
 
+    $cover = $shop['anhbia']; 
+
+if (!empty($_FILES['cover']['name'])) {
+    $upload_dir = 'assets/images/';
+    $filename = time() . '_cover_' . basename($_FILES["cover"]["name"]);
+    $target_file = $upload_dir . $filename;
+
+    if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+
+    if ($cover && file_exists($upload_dir . $cover)) unlink($upload_dir . $cover);
+
+    if (move_uploaded_file($_FILES["cover"]["tmp_name"], $target_file)) {
+        $cover = $filename;
+    }
+}
+
+
     $sql = "UPDATE shop SET 
-                tenshop = '$tenshop', 
-                email = '$email', 
-                sdt = '$sdt', 
-                diachi = '$diachi', 
-                logo = '$logo',
-                lat_shop = '$lat_shop',
-                lng_shop = '$lng_shop'
-            WHERE idshop = '$idshop'";
-    $db->themxoasua($sql);
+            tenshop = '$tenshop', 
+            email = '$email', 
+            sdt = '$sdt', 
+            diachi = '$diachi', 
+            logo = '$logo',
+            anhbia = '$cover',
+            lat_shop = '$lat_shop',
+            lng_shop = '$lng_shop'
+        WHERE idshop = '$idshop'";
+$db->themxoasua($sql);
+
 
     echo "<script>alert('Cập nhật hồ sơ thành công!'); window.location='index.php?page=shop_profile';</script>";
     exit;
@@ -58,17 +77,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
 
     <form method="POST" enctype="multipart/form-data" class="profile-form">
         <div class="profile-header">
-            <img src="assets/images/<?= htmlspecialchars($shop['logo']) ?>" 
-                 class="profile-logo" 
-                 alt="Logo Shop" 
-                 onerror="this.src='assets/images/default_shop.png'">
+    <img src="assets/images/<?= htmlspecialchars($shop['anhbia'] ?? '') ?>" 
+         class="profile-cover" 
+         alt="Ảnh bìa shop"
+         onerror="this.src='assets/images/default_cover.png'">
 
-            <label class="upload-btn">
-                <input type="file" name="logo" accept="image/*" onchange="previewLogo(this)">
-                Thay đổi logo
-            </label>
-            <div id="preview" style="margin-top:10px;"></div>
-        </div>
+    <label class="upload-btn">
+        <input type="file" name="cover" accept="image/*" onchange="previewCover(this)">
+        Thay đổi ảnh bìa
+    </label>
+    <div id="previewCover" style="margin-top:10px;"></div>
+
+    <img src="assets/images/<?= htmlspecialchars($shop['logo']) ?>" 
+         class="profile-logo" 
+         alt="Logo Shop" 
+         onerror="this.src='assets/images/default_shop.png'">
+
+    <label class="upload-btn">
+        <input type="file" name="logo" accept="image/*" onchange="previewLogo(this)">
+        Thay đổi logo
+    </label>
+    <div id="preview" style="margin-top:10px;"></div>
+</div>
 
         <div class="form-group">
             <label>Tên cửa hàng:</label>
@@ -110,8 +140,8 @@ var diachiInput = document.getElementById('diachi');
 var latInput = document.getElementById('lat_shop');
 var lngInput = document.getElementById('lng_shop');
 
-var initialLat = parseFloat(latInput.value) || 21.0278;
-var initialLng = parseFloat(lngInput.value) || 105.8342;
+var initialLat = parseFloat(latInput.value) || 10.8231;
+var initialLng = parseFloat(lngInput.value) || 106.6297;
 
 var map = L.map('map').setView([initialLat, initialLng], 12);
 
