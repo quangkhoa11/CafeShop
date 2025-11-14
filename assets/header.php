@@ -27,12 +27,13 @@
                       $sql = "SELECT tenshop, logo FROM shop WHERE idshop = $idshop";
                       $result = $db->xuatdulieu($sql);
                       $tenshop = ($result && count($result) > 0) ? $result[0]['tenshop'] : 'Shop';
-                      $logo = ($result && !empty($result[0]['logo'])) ? $result[0]['logo'] : './assets/images/icon_shop.png';
+                      $logo = ($result && !empty($result[0]['logo'])) ? 'assets/images/'.$result[0]['logo'] : 'assets/images/icon_shop.png';
                       ?>
                       
                       <a href="index.php?page=shop_dashboard" class="hover:text-orange-500 font-semibold pr-3">Quản lý</a>
                       <a href="index.php?page=shop_products" class="hover:text-orange-500 font-semibold pr-3">Sản phẩm</a>
                       <a href="index.php?page=shop_orders" class="hover:text-orange-500 font-semibold pr-3">Đơn hàng</a>
+                      <a href="index.php?page=shop_promo" class="hover:text-orange-500 font-semibold pr-3">Khuyến mãi</a>
                       <div class="user-dropdown">
                         <button class="user-btn">
                           <img src="<?= htmlspecialchars($logo) ?>" alt="shop" class="user-icon">
@@ -40,7 +41,8 @@
                           <span class="arrow">&#9662;</span>
                         </button>
                         <div class="dropdown-content">
-                          <a href="index.php?page=shop_profile">Hồ sơ Shop</a>
+                          <a href="index.php?page=shop_profile">Hồ sơ</a>
+                          <a href="index.php?page=shop_reviews">Quản lý đánh giá</a>
                           <a href="index.php?page=dangxuat" class="logout">Đăng xuất</a>
                         </div>
                       </div>
@@ -55,7 +57,8 @@
                       ?>
                       
                       <a href="index.php?page=home" class="hover:text-orange-500 font-semibold pr-3">Trang chủ</a>
-                      <a href="index.php?page=menu" class="hover:text-orange-500 font-semibold pr-3">Menu</a>
+                      <a href="index.php?page=menu_new" class="hover:text-orange-500 font-semibold pr-3">Menu</a>
+                      <a href="index.php?page=listShop" class="hover:text-orange-500 font-semibold pr-3">Cửa hàng</a>
                       <a href="index.php?page=cart" class="hover:text-orange-500 font-semibold pr-3">Giỏ hàng</a>
                       <a href="index.php?page=contact" class="hover:text-orange-500 font-semibold pr-3">Liên hệ</a>
 
@@ -78,7 +81,8 @@
               } else {
                   ?>
                   <a href="index.php?page=home" class="hover:text-orange-500 font-semibold pr-3">Trang chủ</a>
-                  <a href="index.php?page=menu" class="hover:text-orange-500 font-semibold pr-3">Menu</a>
+                  <a href="index.php?page=menu_new" class="hover:text-orange-500 font-semibold pr-3">Menu</a>
+                  <a href="index.php?page=listShop" class="hover:text-orange-500 font-semibold pr-3">Cửa hàng</a>
                   <a href="index.php?page=cart" class="hover:text-orange-500 font-semibold pr-3">Giỏ hàng</a>
                   <a href="index.php?page=contact" class="hover:text-orange-500 font-semibold pr-3">Liên hệ</a>
 
