@@ -53,8 +53,9 @@
     }
 }
 
-        
-
+public function thucthi($sql) {
+    return $this->ketnoi()->query($sql);
+}
     }
 
 ?>
