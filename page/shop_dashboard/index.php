@@ -65,7 +65,7 @@ $donhangMoi = $db->xuatdulieu($sqlNew);
             <?php foreach ($donhangMoi as $dh): ?>
               <tr class="hover:bg-gray-50 transition">
                 <td class="py-3 px-4 border-b"><?= htmlspecialchars($dh['iddonban']) ?></td>
-                <td class="py-3 px-4 border-b"><?= htmlspecialchars($dh['ngayban']) ?></td>
+                <td class="py-3 px-4 border-b"><?= date('d/m/Y', strtotime($dh['ngayban'])); ?></td>
                 <td class="py-3 px-4 border-b font-medium text-green-600"><?= number_format($dh['tongtien'], 0, ',', '.') ?> ₫</td>
                 <td class="py-3 px-4 border-b">
                   <span class="status-badge <?= strtolower($dh['trangthai']) ?>"><?= htmlspecialchars($dh['trangthai']) ?></span>
