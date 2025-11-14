@@ -120,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
 <?php if (isset($_SESSION['idkh'])): ?>
     <div class="text-right mt-4">
     <form method="post" action="index.php?page=order-details" style="display:inline;">
-        <button type="submit" name="confirm_order" class="bg-orange-500 text-white font-bold py-2 px-4 rounded" style="border-radius: 3px;">
+        <button type="submit" name="confirm_order" class="bg-yellow-500 text-white font-bold py-2 px-4 rounded" style="border-radius: 3px;">
             Thanh toán
         </button>
     </form>
