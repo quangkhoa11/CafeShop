@@ -49,7 +49,7 @@ if (isset($_POST['pay_cod'])) {
 
         $sql_donban = "
             INSERT INTO donban (iddonban, idkh, ngayban, tennguoinhan, sdtnguoinhan, diachinhan, tongtien, idshop, trangthai)
-            VALUES ('$newID', '$idkh', '$ngayban', '{$orderData['tenkh']}', '{$orderData['sdt']}', '{$orderData['diachi']}', '$tongtien', '$shopId', 'Chưa thanh toán')
+            VALUES ('$newID', '$idkh', '$ngayban', '{$orderData['tenkh']}', '{$orderData['sdt']}', '{$orderData['diachi']}', '$tongtien', '$shopId', 'Chờ xác nhận')
         ";
         $obj->themxoasua($sql_donban);
 
