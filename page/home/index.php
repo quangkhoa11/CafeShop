@@ -96,7 +96,7 @@ $monbanchay = $db->xuatdulieu($sql);
                              class="sanpham-img">
 
                         <div class="shop-info">
-                            <img src="<?php echo $mon['logo']; ?>" 
+                            <img src="assets/images/<?php echo $mon['logo']; ?>" 
                                  alt="<?php echo $mon['tenshop']; ?>" 
                                  class="shop-logo">
                             <span class="shop-name"><?php echo $mon['tenshop']; ?></span>
