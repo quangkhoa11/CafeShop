@@ -1,7 +1,5 @@
 <title>Thông tin cá nhân</title>
 <?php
-session_start();
-require_once 'class/classdb.php'; // Đảm bảo đường dẫn đúng
 
 if (!isset($_SESSION['idkh'])) {
     header("Location: index.php?page=login");
