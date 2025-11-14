@@ -21,20 +21,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify'])) {
         $email = $data['email'];
         $matkhau = $data['matkhau'];
         $logo = $data['logo'];
+        $anhbia = $data['anhbia'];
 
-        // Kết nối CSDL
         $link = new mysqli("localhost", "root", "", "cafeshop");
         if ($link->connect_error) {
             die("Kết nối thất bại: " . $link->connect_error);
         }
 
-        // Kiểm tra trùng số điện thoại
         $check = $link->query("SELECT idshop FROM shop WHERE sdt='$sdt'");
         if ($check && $check->num_rows > 0) {
             $errors[] = "Số điện thoại này đã được đăng ký!";
         } else {
-            $sql = "INSERT INTO shop (tenshop, sdt, diachi, email, matkhau, logo)
-                    VALUES ('$tenshop', '$sdt', '$diachi', '$email', '$matkhau', '$logo')";
+            $sql = "INSERT INTO shop (tenshop, sdt, diachi, email, matkhau, logo, anhbia)
+                    VALUES ('$tenshop', '$sdt', '$diachi', '$email', '$matkhau', '$logo','$anhbia')";
             if ($link->query($sql) === TRUE) {
                 $success = "✅ Xác minh thành công! Shop của bạn đã được đăng ký.<br>
                             <a href='index.php?page=login'>Đăng nhập ngay</a>";

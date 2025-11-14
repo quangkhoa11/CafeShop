@@ -8,13 +8,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     $tenshop = trim($_POST['tenshop']);
     $sdt = trim($_POST['sdt']);
     $diachi = trim($_POST['diachi']);
+    $lat_shop = trim($_POST['lat_shop']);
+    $lng_shop = trim($_POST['lng_shop']);
     $email = trim($_POST['email']);
     $matkhau = $_POST['matkhau'];
     $matkhau2 = $_POST['matkhau2'];
+
     $logo = $_FILES['logo']['name'] ?? '';
+    $anhbia = $_FILES['anhbia']['name'] ?? '';
 
     if (!$tenshop) $errors['tenshop'] = "Vui lòng nhập tên shop.";
-    
+
     if (!$sdt) {
         $errors['sdt'] = "Vui lòng nhập số điện thoại.";
     } elseif (!preg_match('/^(0[3|5|7|8|9])[0-9]{8}$/', $sdt)) {
@@ -44,31 +48,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         $errors['sdt'] = "Số điện thoại này đã được đăng ký.";
     }
 
+    $upload_dir = "assets/images/";
+    if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+
     if ($logo) {
-        $target_dir = "assets/images/";
-        if (!is_dir($target_dir)) mkdir($target_dir, 0777, true);
-        $target_file = $target_dir . basename($logo);
-        $ext = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+        $ext = strtolower(pathinfo($logo, PATHINFO_EXTENSION));
         if (!in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
             $errors['logo'] = "Chỉ chấp nhận file hình ảnh (jpg, jpeg, png, gif).";
         } else {
-            move_uploaded_file($_FILES['logo']['tmp_name'], $target_file);
+            move_uploaded_file($_FILES['logo']['tmp_name'], $upload_dir . $logo);
         }
     } else {
         $errors['logo'] = "Vui lòng tải lên logo cửa hàng.";
     }
+    if ($anhbia) {
+        $ext = strtolower(pathinfo($anhbia, PATHINFO_EXTENSION));
+        if (!in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
+            $errors['anhbia'] = "Chỉ chấp nhận file hình ảnh (jpg, jpeg, png, gif).";
+        } else {
+            move_uploaded_file($_FILES['anhbia']['tmp_name'], $upload_dir . $anhbia);
+        }
+    } else {
+        $errors['anhbia'] = "Vui lòng tải lên ảnh bìa.";
+    }
 
     if (empty($errors)) {
         $otp = rand(100000, 999999);
-        $hashedPassword = password_hash($matkhau, PASSWORD_DEFAULT); 
+        $hashedPassword = password_hash($matkhau, PASSWORD_DEFAULT);
 
         $_SESSION['register_shop'] = [
             'tenshop' => $tenshop,
             'sdt' => $sdt,
             'diachi' => $diachi,
+            'lat_shop' => $lat_shop,
+            'lng_shop' => $lng_shop,
             'email' => $email,
             'matkhau' => $hashedPassword,
-            'logo' => $target_file ?? '',
+            'logo' => $logo,
+            'anhbia' => $anhbia,
             'otp' => $otp
         ];
 
@@ -92,8 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
         if (sendMail($email, $subject, $body)) {
             header("Location: index.php?page=verify_shop_otp");
-exit;
-
+            exit;
         } else {
             $errors['email'] = "Không thể gửi email xác nhận. Vui lòng thử lại.";
         }
@@ -102,6 +118,17 @@ exit;
 ?>
 
 <title>Đăng ký Shop</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+<link rel="stylesheet" href="assets/css/register.css?v=2">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<style>
+#map { height: 350px; margin-top: 10px; }
+.form-group { margin-bottom: 15px; }
+.error-msg { color: red; font-size: 0.875rem; }
+.address-wrapper input { flex:1; padding:8px; font-size:14px; }
+.address-wrapper button { width:90px; padding:8px; font-size:14px; }
+</style>
 
 <div class="register-wrapper">
   <div class="register-box">
@@ -124,7 +151,13 @@ exit;
       <div class="form-group">
         <label>Địa chỉ:</label>
         <small class="error-msg"><?= $errors['diachi'] ?? '' ?></small>
-        <input type="text" name="diachi" value="<?= htmlspecialchars($diachi ?? '') ?>" required>
+        <div class="address-wrapper" style="display:flex; gap:5px; margin-bottom:5px;">
+            <input type="text" id="diachi" name="diachi" value="<?= htmlspecialchars($diachi ?? '') ?>" placeholder="Nhập hoặc tìm địa chỉ trên bản đồ" required>
+            <button type="button" id="searchAddress">🔍 Tìm</button>
+        </div>
+        <input type="hidden" id="lat_shop" name="lat_shop" value="<?= htmlspecialchars($lat_shop ?? '') ?>">
+        <input type="hidden" id="lng_shop" name="lng_shop" value="<?= htmlspecialchars($lng_shop ?? '') ?>">
+        <div id="map" style="border:1px solid #ccc; border-radius:8px;"></div>
       </div>
 
       <div class="form-group">
@@ -137,6 +170,12 @@ exit;
         <label>Logo cửa hàng:</label>
         <small class="error-msg"><?= $errors['logo'] ?? '' ?></small>
         <input type="file" name="logo" accept="image/*" required>
+      </div>
+
+      <div class="form-group">
+        <label>Ảnh bìa:</label>
+        <small class="error-msg"><?= $errors['anhbia'] ?? '' ?></small>
+        <input type="file" name="anhbia" accept="image/*" required>
       </div>
 
       <div class="form-group">
@@ -158,4 +197,62 @@ exit;
   </div>
 </div>
 
-<link rel="stylesheet" href="assets/css/register.css?v=2">
+<script>
+var map = L.map('map').setView([10.8231, 106.6297], 12);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors'}).addTo(map);
+
+var diachiInput = document.getElementById('diachi');
+var latInput = document.getElementById('lat_shop');
+var lngInput = document.getElementById('lng_shop');
+
+var initialLat = parseFloat(latInput.value) || 10.8231;
+var initialLng = parseFloat(lngInput.value) || 106.6297;
+var marker = L.marker([initialLat, initialLng], {draggable:true}).addTo(map);
+map.setView([initialLat, initialLng], 12);
+
+marker.on('dragend', updateAddress);
+map.on('click', function(e){
+    var latlng = e.latlng;
+    marker.setLatLng(latlng);
+
+    latInput.value = latlng.lat;
+    lngInput.value = latlng.lng;
+
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`, 
+          {headers:{'User-Agent':'MyApp/1.0'}})
+    .then(res => res.json())
+    .then(data => {
+        if(data && data.display_name){
+            diachiInput.value = data.display_name;
+        }
+    })
+    .catch(err => console.log(err));
+});
+
+document.getElementById('searchAddress').addEventListener('click', searchAddress);
+
+function updateAddress(){
+    var latlng = marker.getLatLng();
+    latInput.value = latlng.lat;
+    lngInput.value = latlng.lng;
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`, {headers:{'User-Agent':'MyApp/1.0'}})
+    .then(res=>res.json())
+    .then(data=>{ if(data && data.display_name) diachiInput.value = data.display_name; });
+}
+
+function searchAddress(){
+    var query = diachiInput.value;
+    if(!query) return;
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`, {headers:{'User-Agent':'MyApp/1.0'}})
+    .then(res=>res.json())
+    .then(data=>{
+        if(data && data.length>0){
+            var lat=parseFloat(data[0].lat), lon=parseFloat(data[0].lon);
+            map.setView([lat, lon], 16);
+            marker.setLatLng([lat, lon]);
+            latInput.value = lat; lngInput.value = lon;
+            diachiInput.value = data[0].display_name;
+        } else alert("Không tìm thấy địa chỉ.");
+    });
+}
+</script>
