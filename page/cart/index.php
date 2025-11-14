@@ -1,4 +1,5 @@
 <title>Giỏ hàng</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
 <?php
 $obj = new database();
 
@@ -56,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
 ?>
 
 <main class="flex-1 py-10 container mx-auto px-4">
-  <div style="padding-top: 40px;">
+  <div>
     <h1 class="text-3xl font-bold text-center text-orange-600 mb-6 drop-shadow">GIỎ HÀNG</h1>
   </div>
 
@@ -113,10 +114,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
 
     <div class="text-right text-lg font-semibold p-3 text-gray-800">
       <b>Tổng cộng:</b> <span id="total" class="text-orange-600"><b><?php echo number_format($total); ?> ₫</b></span>
-    </div>
-
-    <div style="text-align:center; margin-bottom:15px;">
-        <a href="index.php?page=menu" class="btn-add-item">➕ Thêm món</a>
     </div>
 
     <div class="text-right mr-3">
