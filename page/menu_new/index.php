@@ -1,3 +1,4 @@
+<title>Thực đơn</title>
 <?php
 $obj = new database();
 $loaisp = $obj->xuatdulieu("SELECT * FROM loaisp");
