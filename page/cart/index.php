@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
     <table class="w-full border-collapse text-sm text-gray-700" id="cart-table">
       <thead>
         <tr class="bg-orange-100 text-gray-800 uppercase text-xs tracking-wide">
-          <th class="p-3 border">Hình ảnh</th>
+          <th class="p-3 border"></th>
           <th class="p-3 border">Tên sản phẩm</th>
           <th class="p-3 border">Tùy chọn</th>
           <th class="p-3 border">Giá</th>
@@ -76,17 +76,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
         </tr>
       </thead>
       <tbody>
-        <?php $total = 0; ?>
-        <?php foreach ($_SESSION['cart'] as $cart_key => $item): 
-          $subtotal = $item['gia'] * $item['soluong'];
-          $total += $subtotal;
-        ?>
-        <tr class="hover:bg-orange-50 transition duration-200" data-key="<?php echo $cart_key; ?>">
-          <td class="p-3 border text-center">
+<?php 
+$total = 0;
+
+$shops = [];
+foreach ($_SESSION['cart'] as $cart_key => $item) {
+    $shops[$item['idshop']][$cart_key] = $item;
+}
+
+foreach ($shops as $idshop => $items):
+    $shopname = $obj->xuatdulieu("SELECT tenshop FROM shop WHERE idshop = '$idshop'")[0]['tenshop'];
+?>
+    <tr>
+    <td colspan="7" class="bg-orange-200 text-gray-900 font-bold p-3 border-l-4 border-orange-600 tracking-wide">
+        <div class="flex items-center">
+            <?php 
+                $shopData = $obj->xuatdulieu("SELECT tenshop, logo FROM shop WHERE idshop = '$idshop'")[0];
+                $shopname = $shopData['tenshop'];
+                $shoplogo = !empty($shopData['logo']) ? $shopData['logo'] : 'default-logo.png';
+            ?>
+            <img src="assets/images/<?php echo htmlspecialchars($shoplogo); ?>" 
+                 alt="Logo" class="w-8 h-8 object-cover rounded-full mr-2 border border-gray-300">
+            🏪 <?php echo htmlspecialchars($shopname); ?>
+        </div>
+    </td>
+</tr>
+
+
+    <?php foreach ($items as $cart_key => $item): 
+        $subtotal = $item['gia'] * $item['soluong'];
+        $total += $subtotal;
+    ?>
+    <tr class="hover:bg-orange-50 transition duration-200" data-key="<?php echo $cart_key; ?>">
+        <td class="p-3 border text-center">
             <img src="assets/images/<?php echo htmlspecialchars($item['hinhanh']); ?>" class="w-16 h-16 object-cover rounded-md mx-auto shadow-sm border border-gray-200">
-          </td>
-          <td class="p-3 border font-semibold text-gray-800 text-center"><?php echo htmlspecialchars($item['tensp']); ?></td>
-          <td class="p-3 border text-left leading-snug">
+        </td>
+        <td class="p-3 border font-semibold text-gray-800 text-center"><?php echo htmlspecialchars($item['tensp']); ?></td>
+        <td class="p-3 border text-left leading-snug">
             <?php
               $options = [];
               if (!empty($item['da'])) $options[] = "<b>Đá:</b> " . htmlspecialchars($item['da']);
@@ -96,20 +122,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
               if (!empty($item['ghichu'])) $options[] = "<b>Ghi chú:</b> " . htmlspecialchars($item['ghichu']);
               echo implode("<br>", $options);
             ?>
-          </td>
-          <td class="p-3 border text-center font-bold"><b class="text-orange-600"><?php echo number_format($item['gia']); ?>₫</b></td>
-          <td class="p-3 border text-center">
+        </td>
+        <td class="p-3 border text-center font-bold"><b class="text-orange-600"><?php echo number_format($item['gia']); ?>₫</b></td>
+        <td class="p-3 border text-center">
             <input type="number" min="1" value="<?php echo $item['soluong']; ?>" 
                    class="w-16 text-center border border-gray-300 rounded-lg py-1 text-sm focus:ring-2 focus:ring-orange-300 focus:border-orange-400 quantity-input"
                    data-price="<?php echo $item['gia']; ?>">
-          </td>
-          <td class="p-3 border text-center font-semibold text-gray-800 subtotal"><?php echo number_format($subtotal); ?>₫</td>
-          <td class="p-3 border text-center">
+        </td>
+        <td class="p-3 border text-center font-semibold text-gray-800 subtotal"><?php echo number_format($subtotal); ?>₫</td>
+        <td class="p-3 border text-center">
             <button type="button" onclick="removeItem('<?php echo $cart_key; ?>')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-full text-xs shadow transition duration-200">✖</button>
-          </td>
-        </tr>
-        <?php endforeach; ?>
-      </tbody>
+        </td>
+    </tr>
+    <?php endforeach; ?>
+<?php endforeach; ?>
+</tbody>
+
     </table>
 
     <div class="text-right text-lg font-semibold p-3 text-gray-800">
