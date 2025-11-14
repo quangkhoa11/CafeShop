@@ -11,7 +11,7 @@ if (!empty($_SESSION['zalopay_pending'])) {
     unset($_SESSION['zalopay_pending']); 
     echo "<script>
         alert('Đơn hàng của bạn đang ở trạng thái Chờ thanh toán!');
-        window.location='index.php?page=menu';
+        window.location='index.php?page=menu_new';
     </script>";
     exit();
 }
@@ -66,7 +66,7 @@ if (isset($_POST['pay_cod'])) {
     }
 
     unset($_SESSION['order']);
-    echo "<script>alert('Đặt hàng thành công!'); window.location='index.php?page=menu';</script>";
+    echo "<script>alert('Đặt hàng thành công!'); window.location='index.php?page=menu_new';</script>";
     exit();
 }
 
