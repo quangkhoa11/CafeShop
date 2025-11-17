@@ -31,7 +31,8 @@ $sql = "
     FROM donban db
     JOIN khachhang kh ON db.idkh = kh.idkh
     WHERE db.idshop = '$idshop'
-    ORDER BY db.trangthai = 'Hoàn thành' ASC
+      AND db.trangthai != 'Hoàn thành' AND db.trangthai != 'Đã hủy' AND db.trangthai != 'Chờ thanh toán'
+    ORDER BY db.iddonban DESC
 ";
 $donhangs = $db->xuatdulieu($sql);
 ?>
@@ -48,7 +49,7 @@ $donhangs = $db->xuatdulieu($sql);
             <table class="orders-table">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>Mã đơn</th>
                         <th>Khách hàng</th>
                         <th>Ngày đặt</th>
                         <th>Người nhận</th>
@@ -61,7 +62,7 @@ $donhangs = $db->xuatdulieu($sql);
                 <tbody>
                     <?php foreach ($donhangs as $i => $dh): ?>
                         <tr>
-                            <td><?= $i + 1 ?></td>
+                            <td>#<?= htmlspecialchars($dh['iddonban']) ?></td>
                             <td><?= htmlspecialchars($dh['tenkh']) ?></td>
                             <td><?= date("d/m/Y", strtotime($dh['ngayban'])) ?></td>
                             <td><?= htmlspecialchars($dh['tennguoinhan']) ?></td>
