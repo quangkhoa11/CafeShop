@@ -1,6 +1,5 @@
 <?php
 date_default_timezone_set('Asia/Ho_Chi_Minh');
-
 $obj = new database();
 
 $config = [
@@ -26,19 +25,19 @@ try {
         $order = json_decode($data["data"], true);
         $embed = json_decode($order["embed_data"], true);
 
-        $order_id = $embed["iddonban"] ?? null;
-
-        if ($order_id) {
-            $sql = "UPDATE donban SET trangthai='Đã thanh toán' WHERE iddonban='$order_id'";
-            $obj->themxoasua($sql);
-
-            file_put_contents(__DIR__ . "/callback_log.txt", "✅ Đã cập nhật trạng thái cho đơn: $order_id" . PHP_EOL, FILE_APPEND);
+        $order_ids = $embed["orders"] ?? [];
+        if (!empty($order_ids)) {
+            foreach ($order_ids as $iddonban) {
+                $sql = "UPDATE donban SET trangthai='Đã thanh toán' WHERE iddonban='$iddonban'";
+                $obj->themxoasua($sql);
+                file_put_contents(__DIR__ . "/callback_log.txt", "✅ Đã cập nhật trạng thái cho đơn: $iddonban" . PHP_EOL, FILE_APPEND);
+            }
             $result["return_code"] = 1;
             $result["return_message"] = "success";
         } else {
             file_put_contents(__DIR__ . "/callback_log.txt", "❌ Không tìm thấy iddonban trong embed_data" . PHP_EOL, FILE_APPEND);
             $result["return_code"] = 0;
-            $result["return_message"] = "Missing order_id";
+            $result["return_message"] = "Missing order_ids";
         }
     }
 } catch (Exception $e) {

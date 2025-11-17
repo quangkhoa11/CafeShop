@@ -32,6 +32,8 @@ function generateOrderID($obj) {
     }
     return 'DB001';
 }
+
+// --- Thanh toán COD ---
 if (isset($_POST['pay_cod'])) {
     $orderData = $_SESSION['order'];
     $idkh = $_SESSION['idkh'] ?? 1;
@@ -70,6 +72,7 @@ if (isset($_POST['pay_cod'])) {
     exit();
 }
 
+// --- Thanh toán ZaloPay tổng ---
 if (isset($_POST['pay_zalopay'])) {
     date_default_timezone_set('Asia/Ho_Chi_Minh');
     $idkh = $_SESSION['idkh'] ?? 1;
@@ -87,20 +90,24 @@ if (isset($_POST['pay_zalopay'])) {
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
     $host = $_SERVER['HTTP_HOST'];
     $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
-    if ($basePath === '/' || $basePath === '\\') $basePath = ''; 
-
+    if ($basePath === '/' || $basePath === '\\') $basePath = '';
     $redirect = "$protocol://$host$basePath/index.php?page=return";
     $callback = "$protocol://$host$basePath/index.php?page=callback";
 
+    // --- Tạo đơn shop riêng ---
     $ordersByShop = [];
     foreach ($orderData['cart'] as $item) {
         $shopId = $item['idshop'] ?? 1;
         $ordersByShop[$shopId][] = $item;
     }
 
+    $createdOrders = [];
+    $tongtien_all = 0;
+
     foreach ($ordersByShop as $shopId => $items) {
         $newID = generateOrderID($obj);
         $tongtien = array_sum(array_map(fn($i) => $i['gia'] * $i['soluong'], $items));
+        $tongtien_all += $tongtien;
 
         $sql_donban = "
             INSERT INTO donban (iddonban, idkh, ngayban, tennguoinhan, sdtnguoinhan, diachinhan, tongtien, idshop, trangthai)
@@ -119,52 +126,68 @@ if (isset($_POST['pay_zalopay'])) {
             $obj->themxoasua($sql_chitiet);
         }
 
-        $transID = rand(1000000, 9999999);
-        $orderID = date("ymd") . "_" . $transID;
-        $embeddata = json_encode(["redirecturl" => $redirect, "iddonban" => $newID]);
-        $itemsZalo = json_encode([["itemid" => "cf01", "itemname" => "Đơn hàng The Dream Shop #$shopId", "itemprice" => $tongtien, "itemquantity" => 1]]);
+        $createdOrders[] = $newID;
+    }
 
-        $orderZalo = [
-            "app_id" => $config["app_id"],
-            "app_trans_id" => $orderID,
-            "app_user" => "user_the_dream",
-            "app_time" => round(microtime(true) * 1000),
-            "item" => $itemsZalo,
-            "embed_data" => $embeddata,
-            "amount" => $tongtien,
-            "description" => "Thanh toán đơn The Dream Shop #$shopId",
-            "bank_code" => "",
-            "callback_url" => $callback
+    // --- Chuẩn bị ZaloPay ---
+    $transID = rand(1000000, 9999999);
+    $orderID = date("ymd") . "_" . $transID;
+
+    $embeddata = json_encode([
+        "redirecturl" => $redirect,
+        "orders" => $createdOrders
+    ]);
+
+    $itemsZalo = [];
+    foreach ($orderData['cart'] as $item) {
+        $itemsZalo[] = [
+            "itemid" => $item['idsp'],
+            "itemname" => $item['tensp'],
+            "itemprice" => $item['gia'],
+            "itemquantity" => $item['soluong']
         ];
+    }
 
-        $data = $orderZalo["app_id"] . "|" . $orderZalo["app_trans_id"] . "|" . $orderZalo["app_user"] . "|" .
-                 $orderZalo["amount"] . "|" . $orderZalo["app_time"] . "|" . $orderZalo["embed_data"] . "|" . $orderZalo["item"];
-        $orderZalo["mac"] = hash_hmac("sha256", $data, $config["key1"]);
+    $orderZalo = [
+        "app_id" => $config["app_id"],
+        "app_trans_id" => $orderID,
+        "app_user" => "user_the_dream",
+        "app_time" => round(microtime(true) * 1000),
+        "item" => json_encode($itemsZalo),
+        "embed_data" => $embeddata,
+        "amount" => $tongtien_all,
+        "description" => "Thanh toán tổng đơn The Dream Shop",
+        "bank_code" => "",
+        "callback_url" => $callback
+    ];
 
-        $context = stream_context_create([
-            "http" => [
-                "header" => "Content-Type: application/x-www-form-urlencoded",
-                "method" => "POST",
-                "content" => http_build_query($orderZalo)
-            ]
-        ]);
+    $data = $orderZalo["app_id"] . "|" . $orderZalo["app_trans_id"] . "|" . $orderZalo["app_user"] . "|" .
+             $orderZalo["amount"] . "|" . $orderZalo["app_time"] . "|" . $orderZalo["embed_data"] . "|" . $orderZalo["item"];
+    $orderZalo["mac"] = hash_hmac("sha256", $data, $config["key1"]);
 
-        $response = file_get_contents($config["endpoint"], false, $context);
-        $result = json_decode($response, true);
+    $context = stream_context_create([
+        "http" => [
+            "header" => "Content-Type: application/x-www-form-urlencoded",
+            "method" => "POST",
+            "content" => http_build_query($orderZalo)
+        ]
+    ]);
 
-        if (isset($result["return_code"]) && $result["return_code"] == 1) {
-            header("Location: " . $result["order_url"]);
-            exit();
-        } else {
-            $error = "Không thể tạo đơn thanh toán ZaloPay cho shop #$shopId. Vui lòng thử lại.";
-        }
+    $response = file_get_contents($config["endpoint"], false, $context);
+    $result = json_decode($response, true);
+
+    if (isset($result["return_code"]) && $result["return_code"] == 1) {
+        header("Location: " . $result["order_url"]);
+        exit();
+    } else {
+        $error = "Không thể tạo đơn thanh toán ZaloPay. Vui lòng thử lại.";
     }
 }
 ?>
 
+<!-- HTML hiển thị giống trước -->
 <div class="payment-container">
     <h1 class="payment-title">XÁC NHẬN THANH TOÁN</h1>
-
     <?php if(isset($error)): ?>
         <p style="color:red; text-align:center;"><?= $error ?></p>
     <?php endif; ?>
