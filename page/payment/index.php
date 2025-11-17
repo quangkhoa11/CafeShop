@@ -125,7 +125,7 @@ if (isset($_POST['pay_zalopay'])) {
 
         $createdOrders[] = $newID;
     }
-    
+
     $transID = rand(1000000, 9999999);
     $orderID = date("ymd") . "_" . $transID;
 
@@ -181,7 +181,6 @@ if (isset($_POST['pay_zalopay'])) {
 }
 ?>
 
-<!-- HTML hiển thị giống trước -->
 <div class="payment-container">
     <h1 class="payment-title">XÁC NHẬN THANH TOÁN</h1>
     <?php if(isset($error)): ?>
