@@ -32,6 +32,16 @@ try {
                 $obj->themxoasua($sql);
                 file_put_contents(__DIR__ . "/callback_log.txt", "✅ Đã cập nhật trạng thái cho đơn: $iddonban" . PHP_EOL, FILE_APPEND);
             }
+
+            if (isset($embed["parent_order_id"])) {
+                $parent_id = $embed["parent_order_id"];
+
+                $sql = "UPDATE donban_tong SET trangthai='Đã thanh toán' WHERE idtong='$parent_id'";
+                $obj->themxoasua($sql);
+
+                file_put_contents(__DIR__ . "/callback_log.txt", "🔥 Đã cập nhật đơn tổng: $parent_id" . PHP_EOL, FILE_APPEND);
+            }
+
             $result["return_code"] = 1;
             $result["return_message"] = "success";
         } else {
