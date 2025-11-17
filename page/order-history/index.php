@@ -13,7 +13,7 @@ $donhang = $db->xuatdulieu("
     FROM donban d
     JOIN shop s ON d.idshop = s.idshop
     WHERE d.idkh = '$idkh'
-    ORDER BY d.ngayban DESC
+    ORDER BY d.iddonban DESC
 ");
 ?>
 
@@ -48,16 +48,25 @@ $donhang = $db->xuatdulieu("
                                 <?= number_format($d['tongtien'], 0, ',', '.') ?>₫
                             </td>
                             <td class="px-4 py-2">
-                                <span class="px-2 py-1 rounded text-white text-xs 
-                                    <?= $d['trangthai'] === 'Hoàn thành' ? 'bg-green-500' : 
-                                        ($d['trangthai'] === 'Đang giao' ? 'bg-blue-500' : 'bg-gray-400') ?>">
-                                    <?= htmlspecialchars($d['trangthai']) ?>
-                                </span>
+                                <?php if ($d['trangthai'] === 'Chờ thanh toán' || $d['trangthai'] === 'Chưa thanh toán'): ?>
+                                    
+                                    <a href="index.php?page=payment_back&rePay=<?= $d['iddonban'] ?>"
+                                    class="px-3 py-1 rounded bg-orange-500 text-white text-xs font-semibold hover:bg-orange-600 transition">
+                                        Thanh toán lại
+                                    </a>
+
+                                <?php else: ?>
+                                    <span class="px-2 py-1 rounded text-white text-xs 
+                                        <?= $d['trangthai'] === 'Hoàn thành' ? 'bg-green-500' : 
+                                            ($d['trangthai'] === 'Đang giao' ? 'bg-blue-500' : 'bg-gray-400') ?>">
+                                        <?= htmlspecialchars($d['trangthai']) ?>
+                                    </span>
+                                <?php endif; ?>
                             </td>
+
                             <td class="px-4 py-2 text-center">
                                 <?php if ($d['trangthai'] === 'Hoàn thành'): ?>
                                     <?php
-                                        // Kiểm tra xem khách đã đánh giá đơn này chưa
                                         $danhgia = $db->xuatdulieu("
                                             SELECT COUNT(*) AS total 
                                             FROM rating_sanpham 
