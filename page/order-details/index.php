@@ -86,16 +86,29 @@ if (isset($_SESSION['order'])) {
                     foreach ($cart as $item): ?>
                     <tr>
                         <td><?= htmlspecialchars($item['tensp']) ?></td>
-                        <td>
+                                                <td class="flex items-center gap-2">
                             <?php
                             $shopName = '';
+                            $logoShop = 'assets/images/no-shop.png'; 
+
                             if (isset($item['idshop'])) {
-                                $shop = $obj->xuatdulieu("SELECT tenshop FROM shop WHERE idshop = ".$item['idshop']);
-                                $shopName = !empty($shop) ? $shop[0]['tenshop'] : '-';
+                                $shop = $obj->xuatdulieu("SELECT tenshop, logo FROM shop WHERE idshop = ".$item['idshop']);
+                                if (!empty($shop)) {
+                                    $shopName = $shop[0]['tenshop'];
+                                    if (!empty($shop[0]['logo'])) {
+                                        $logoShop = $shop[0]['logo'];
+                                    }
+                                }
                             }
-                            echo htmlspecialchars($shopName);
                             ?>
+                            
+                            <img src="assets/images/<?= htmlspecialchars($logoShop) ?>" 
+                                alt="Logo shop"
+                                class="w-8 h-8 rounded-full shadow border object-cover">
+
+                            <span><?= htmlspecialchars($shopName) ?></span>
                         </td>
+
                         <td><?= htmlspecialchars($item['da'] ?? '-') ?></td>
                         <td><?= htmlspecialchars($item['duong'] ?? '-') ?></td>
                         <td><?= htmlspecialchars($item['size'] ?? 'M') ?></td>
@@ -119,112 +132,148 @@ if (isset($_SESSION['order'])) {
 <?php endif; ?>
 
 <style>
+
 .order-container {
     max-width: 1100px;
     margin: 40px auto;
-    padding: 20px;
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    color: #333;
+    padding: 25px;
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #eee;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.05);
 }
+
 .order-title {
     text-align: center;
-    font-size: 28px;
+    font-size: 32px;
     font-weight: bold;
+    letter-spacing: 1px;
     color: #ff6600;
-    border-bottom: 3px solid #ff6600;
-    padding-bottom: 10px;
+    padding-bottom: 14px;
     margin-bottom: 30px;
+    border-bottom: 4px solid #ff6600;
 }
+
 .order-grid {
     display: grid;
     grid-template-columns: 1fr 2fr;
-    gap: 25px;
+    gap: 30px;
 }
+
 .customer-info {
-    background: #fff8f0;
-    border: 1px solid #ffc299;
-    border-radius: 10px;
+    background: linear-gradient(to bottom right, #fff4e6, #ffe8d1);
+    border: 1px solid #ffcc99;
+    border-radius: 14px;
     padding: 20px;
-    box-shadow: 0 2px 8px rgba(255, 102, 0, 0.1);
+    box-shadow: 0 3px 10px rgba(255, 150, 60, 0.15);
 }
+
 .customer-info h2 {
-    color: #ff6600;
-    font-size: 20px;
+    font-size: 22px;
     margin-bottom: 15px;
+    color: #ff6600;
+    font-weight: bold;
 }
-.customer-info p {
-    margin: 8px 0;
-    font-size: 16px;
-}
+
 .customer-info input {
     width: 100%;
-    padding: 8px 10px;
-    margin-top: 4px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    margin-top: 6px;
+    padding: 10px 12px;
+    border: 1px solid #d7d7d7;
+    background: #fff;
+    border-radius: 8px;
+    transition: 0.25s;
 }
+
+.customer-info input:focus {
+    border-color: #ff8800;
+    box-shadow: 0 0 0 3px rgba(255,140,0,0.2);
+}
+
 .note {
     margin-top: 15px;
-    background: #fff0e0;
-    padding: 10px;
-    border-left: 4px solid #ff6600;
-    font-size: 14px;
+    background: #fff6e9;
+    padding: 12px;
+    border-left: 4px solid #ff8800;
+    border-radius: 8px;
     color: #555;
 }
+
 .btn-save-order {
-    display: block;
-    margin: 25px auto 0;
-    background-color: #28a745;
-    color: white;
-    font-weight: bold;
-    font-size: 18px;
-    padding: 12px 30px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
+    margin-top: 25px;
     width: 100%;
-    transition: background 0.3s;
+    padding: 14px;
+    font-size: 18px;
+    background: linear-gradient(to right, #28a745, #34c759);
+    border: none;
+    color: white;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
 }
 .btn-save-order:hover {
-    background-color: #218838;
+    transform: translateY(-2px);
+    background: linear-gradient(to right, #23963e, #2ebf53);
 }
 
 .order-table-wrapper {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 10px;
+    background: white;
+    border: 1px solid #eee;
     padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border-radius: 14px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.05);
 }
+
 .order-table-wrapper h2 {
+    font-size: 22px;
     color: #ff6600;
-    font-size: 20px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    font-weight: bold;
 }
+
 table {
     width: 100%;
     border-collapse: collapse;
+    border-radius: 12px;
+    overflow: hidden;
     font-size: 15px;
 }
+
 thead {
-    background: #ffe0b3;
+    background: linear-gradient(to right, #ffd1a1, #ffbb77);
 }
-th, td {
-    padding: 10px 8px;
-    border: 1px solid #ddd;
-}
-th {
-    text-align: center;
-}
-.text-right { text-align: right; }
-.text-center { text-align: center; }
-tfoot td {
+
+thead th {
+    padding: 12px;
     font-weight: bold;
-    background: #fff6e6;
+    text-transform: uppercase;
 }
+
+tbody tr {
+    transition: background 0.2s;
+}
+
+tbody tr:hover {
+    background: #fff9f1;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+tfoot td {
+    padding: 12px;
+    background: #fff4e2;
+    font-weight: bold;
+    font-size: 16px;
+    border-top: 2px solid #ffca8a;
+}
+
 .total-price {
     color: #ff6600;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
 }
 </style>
