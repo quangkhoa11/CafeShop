@@ -88,7 +88,7 @@ foreach ($shops as $idshop => $items):
     $shopname = $obj->xuatdulieu("SELECT tenshop FROM shop WHERE idshop = '$idshop'")[0]['tenshop'];
 ?>
     <tr>
-    <td colspan="7" class="bg-orange-200 text-gray-900 font-bold p-3 border-l-4 border-orange-600 tracking-wide">
+    <td colspan="7" class="bg-yellow-100 text-gray-900 font-bold p-3 border-l-4 border-orange-600 tracking-wide">
         <div class="flex items-center">
             <?php 
                 $shopData = $obj->xuatdulieu("SELECT tenshop, logo FROM shop WHERE idshop = '$idshop'")[0];
