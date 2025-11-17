@@ -19,7 +19,7 @@ $sqlDT = "SELECT SUM(tongtien) AS tongdt FROM donban WHERE idshop = '$idshop' AN
 $dt = $db->xuatdulieu($sqlDT);
 $tongdt = number_format($dt[0]['tongdt'] ?? 0, 0, ',', '.');
 
-$sqlNew = "SELECT iddonban, ngayban, tongtien, trangthai FROM donban WHERE idshop = '$idshop' ORDER BY ngayban DESC LIMIT 5";
+$sqlNew = "SELECT iddonban, ngayban, tongtien, trangthai FROM donban WHERE idshop = '$idshop' AND trangthai != 'Đã hủy' AND trangthai != 'Chờ thanh toán' ORDER BY ngayban DESC LIMIT 5";
 $donhangMoi = $db->xuatdulieu($sqlNew);
 ?>
 
