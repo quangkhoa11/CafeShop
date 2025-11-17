@@ -33,7 +33,6 @@ function generateOrderID($obj) {
     return 'DB001';
 }
 
-// --- Thanh toán COD ---
 if (isset($_POST['pay_cod'])) {
     $orderData = $_SESSION['order'];
     $idkh = $_SESSION['idkh'] ?? 1;
@@ -72,7 +71,6 @@ if (isset($_POST['pay_cod'])) {
     exit();
 }
 
-// --- Thanh toán ZaloPay tổng ---
 if (isset($_POST['pay_zalopay'])) {
     date_default_timezone_set('Asia/Ho_Chi_Minh');
     $idkh = $_SESSION['idkh'] ?? 1;
@@ -94,7 +92,6 @@ if (isset($_POST['pay_zalopay'])) {
     $redirect = "$protocol://$host$basePath/index.php?page=return";
     $callback = "$protocol://$host$basePath/index.php?page=callback";
 
-    // --- Tạo đơn shop riêng ---
     $ordersByShop = [];
     foreach ($orderData['cart'] as $item) {
         $shopId = $item['idshop'] ?? 1;
@@ -128,8 +125,7 @@ if (isset($_POST['pay_zalopay'])) {
 
         $createdOrders[] = $newID;
     }
-
-    // --- Chuẩn bị ZaloPay ---
+    
     $transID = rand(1000000, 9999999);
     $orderID = date("ymd") . "_" . $transID;
 
