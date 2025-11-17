@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
 <title>Chi tiết đơn hàng</title>
 <?php
 $title = "Chi tiết đơn hàng";
@@ -24,21 +25,15 @@ if (isset($_POST['confirm_order_orderdetails'])) {
             ], $cart),
             'tongtien' => array_sum(array_map(fn($i) => $i['gia'] * $i['soluong'], $cart))
         ];
-        unset($_SESSION['cart']);
-        header('Location: index.php?page=payment');
+        header("Location: index.php?page=payment");
         exit();
     } else {
         $error = "Giỏ hàng rỗng, không thể thanh toán!";
     }
 }
 
+
 $order = $_SESSION['order'] ?? null;
-if (isset($_SESSION['order'])) {
-    unset($_SESSION['order']);
-    unset($_SESSION['cart']);
-    header("Location: index.php?page=menu");
-    exit();
-}
 ?>
 
 <?php if ($order || !empty($_SESSION['cart'])): ?>
