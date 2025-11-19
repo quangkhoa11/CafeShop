@@ -13,9 +13,9 @@ $sql = "
 ";
 $shops = $db->xuatdulieu($sql);
 ?>
+
 <title>Cửa hàng</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-
 <div class="max-w-7xl mx-auto px-4 py-10">
 
   <h1 class="text-2xl font-semibold text-gray-800 mb-8 text-center">Danh sách cửa hàng</h1>
