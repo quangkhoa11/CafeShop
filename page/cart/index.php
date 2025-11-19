@@ -78,7 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cart'])) {
       <tbody>
 <?php 
 $total = 0;
-
 $shops = [];
 foreach ($_SESSION['cart'] as $cart_key => $item) {
     $shops[$item['idshop']][$cart_key] = $item;
